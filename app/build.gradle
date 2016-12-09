@@ -7,7 +7,7 @@ android {
         applicationId "com.shanmao200"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 10206
+        versionCode 102111
         versionName "1.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -24,11 +24,14 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    testCompile 'junit:junit:4.12'
     compile files('libs/MobCommons-2016.1107.1809.jar')
     compile files('libs/MobTools-2016.1107.1809.jar')
     compile files('libs/ShareSDK-Core-2.7.10.jar')
     compile files('libs/ShareSDK-Wechat-2.7.10.jar')
     compile files('libs/ShareSDK-Wechat-Core-2.7.10.jar')
     compile files('libs/ShareSDK-Wechat-Moments-2.7.10.jar')
+    compile files('libs/libammsdk.jar')
+    compile files('libs/alipaySdk-20160825.jar')
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    testCompile 'junit:junit:4.12'
 }
