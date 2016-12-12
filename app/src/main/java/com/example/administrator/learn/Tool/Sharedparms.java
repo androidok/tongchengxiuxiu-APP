@@ -20,6 +20,13 @@ public class Sharedparms {
     public static class weixinInfo {
         public static String WEIXIN_APPID = "wx7c35ac6495868a48";
         public static String WINXIN_SECRET = "ec9423ddc4c6ec73395f0da8de91afbd";
+        //商户号
+        public static String WINXIN_PARTNERID="1359749402";
+        //key
+        public static String WEIXIN_KEY="641e3e03a32cfced53af2bacab970da8";
+        //统一下单生成订单的接口
+        public static String WEIXIN_API="https://api.mch.weixin.qq.com/pay/unifiedorder";
+
     }
 
     /**
