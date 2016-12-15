@@ -2,6 +2,7 @@ package com.example.administrator.learn.Tool;
 
 import android.app.Application;
 
+import cn.jpush.android.api.JPushInterface;
 import cn.sharesdk.framework.ShareSDK;
 
 /**
@@ -13,5 +14,7 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         ShareSDK.initSDK(this);
+        /*极光推送*/
+        JPushInterface.init(this);
     }
 }
