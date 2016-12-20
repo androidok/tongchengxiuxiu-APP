@@ -3,22 +3,18 @@ package com.example.administrator.learn;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.alipay.sdk.app.PayTask;
-import com.alipay.sdk.app.statistic.c;
 import com.example.administrator.learn.Tool.EvenbusInfo;
 import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.SignUtils;
@@ -102,7 +98,6 @@ public class MainActivity extends Activity {
                         String extra = extras.getString("extra");
                         if (!TextUtils.isEmpty(extra)) {
                             JSONObject jsonObject = new JSONObject(extra);
-                            Log.e("111111", "openNotification" + jsonObject.toString());
                             //push推送出来  打开主页面，然后调用js方法,这个时候要等会再加载，不然主页面还没出来，加载这个就加载不出来
                             mwebview.loadUrl("javascript:openNotification(" + jsonObject + ")");
                         }
@@ -220,7 +215,7 @@ public class MainActivity extends Activity {
 
     }
 
-    /**
+    /**推送过来   当打开app页面时
      * @param push
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -251,7 +246,7 @@ public class MainActivity extends Activity {
         public void setAlias(String id) {
             //传id过来，设置别名
 //            Toast.makeText(MainActivity.this, "别名"+id, Toast.LENGTH_LONG).show();
-            JPushInterface.setAlias(MainActivity.this, "android", null);
+            JPushInterface.setAlias(MainActivity.this, id, null);
         }
 
         /*
@@ -407,7 +402,6 @@ public class MainActivity extends Activity {
                 // 必须异步调用
                 Thread payThread = new Thread(payRunnable);
                 payThread.start();
-//                Toast.makeText(MainActivity.this, payInfo, Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -469,7 +463,7 @@ public class MainActivity extends Activity {
                         mwebview.loadUrl("javascript:error(" + resultStatus + ")");
                     }
 //                        Toast.makeText(MainActivity.this,""+resultStatus,Toast.LENGTH_SHORT).show();
-                } else if (msg.what == WEIXIN_PAY) {
+                } else if (msg.what == WEIXIN_PAY) {//微信支付
                     Map<String, String> map = (Map<String, String>) msg.obj;
                     String prepay_id = map.get("prepay_id");
                     String noncestr = map.get("noncestr");

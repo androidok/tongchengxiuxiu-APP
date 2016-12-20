@@ -9,7 +9,6 @@
     <ImageView
         android:layout_width="match_parent"
         android:background="@mipmap/spalsh"
-        android:scaleType="fitXY"
         android:layout_height="match_parent"/>
 
 </RelativeLayout>
