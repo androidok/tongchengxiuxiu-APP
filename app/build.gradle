@@ -20,6 +20,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    /*阿里云推流*/
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a'
+        }
+
+    }
 }
 
 dependencies {
@@ -41,5 +50,10 @@ dependencies {
     /*极光推送*/
     compile files('libs/jcore-android_v1.0.0.jar')
     compile files('libs/jpush-android_v3.0.0.jar')
-
+    compile files('libs/alivc-live-record-v1.2.0.jar')
+    compile 'com.jakewharton:butterknife:5.1.1'
+    compile 'com.github.bumptech.glide:glide:3.5.2'
+    compile 'com.amitshekhar.android:android-networking:0.2.0'
+    compile 'com.amitshekhar.android:rx-android-networking:0.1.0'
+    compile 'org.apache.httpcomponents:httpcore:4.4.1'
 }

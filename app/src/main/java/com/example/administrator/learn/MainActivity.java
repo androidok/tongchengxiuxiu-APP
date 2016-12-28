@@ -1,21 +1,27 @@
 package com.example.administrator.learn;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.alipay.sdk.app.PayTask;
 import com.example.administrator.learn.Tool.EvenbusInfo;
+import com.example.administrator.learn.Tool.SPUtils;
+import com.example.administrator.learn.Tool.ShareUtils;
 import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.SignUtils;
 import com.example.administrator.learn.Tool.Util;
@@ -40,6 +46,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 import cn.jpush.android.api.JPushInterface;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
@@ -55,6 +64,10 @@ import cn.sharesdk.wechat.moments.WechatMoments;
 
 public class MainActivity extends Activity {
 
+    @InjectView(R.id.btn_pushflow)
+    Button btnPushflow;
+    @InjectView(R.id.btn_paishe)
+    Button btnPaishe;
     private WebView mwebview;
     private static final int MSG_WEIXIN_SCUSSE = 1;
     private static final int MSG_WEIXIN_ERROR = 2;
@@ -66,6 +79,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.inject(this);
         mwebview = (WebView) findViewById(R.id.webView);
         EventBus.getDefault().register(this);
         this.mainActivity = this;
@@ -162,7 +176,7 @@ public class MainActivity extends Activity {
             switch (msg.what) {
                 case MSG_WEIXIN_SCUSSE:
                     Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_LONG).show();
-                    Platform platform = (cn.sharesdk.framework.Platform) msg.obj;
+                    Platform platform = (Platform) msg.obj;
                     PlatformDb db = platform.getDb();
                     try {
                         JSONObject jsonObject = new JSONObject(db.exportData());
@@ -215,7 +229,9 @@ public class MainActivity extends Activity {
 
     }
 
-    /**推送过来   当打开app页面时
+    /**
+     * 推送过来   当打开app页面时
+     *
      * @param push
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -226,6 +242,36 @@ public class MainActivity extends Activity {
             mwebview.loadUrl("javascript:receiveNotification(" + jsonObject + ")");
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+    }
+
+    @OnClick({R.id.btn_pushflow, R.id.btn_paishe})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_pushflow:
+                   /*开始推流*/
+                PushFlowActivity.RequestBuilder builder = new PushFlowActivity.RequestBuilder()
+                        .bestBitrate(600)
+                        .cameraFacing(1)//是否前置摄像头  1前面  0后面
+                        .dx(14)//marginx
+                        .dy(14)
+                        .site(1)//水印位置
+                        .rtmpUrl("rtmp://video-center.alivecdn.com/shanmao1/259725?vhost=live.jnoo.com")//rtmp服务器地址
+                        .videoResolution(360)
+                        .portrait(false)//是否横屏
+                        //.watermarkUrl("assets:///spalsh.png")// 水印图片路径
+                        //.watermarkUrl("assets://qupai-logo.png")
+                        .minBitrate(500)//帧率
+                        .maxBitrate(800)
+                        .frameRate(600)
+                        .initBitrate(800);
+                PushFlowActivity.startActivity(view.getContext(), builder);
+                break;
+            case R.id.btn_paishe:
+
+                startActivity(new Intent(this,CameraActivity.class));
+                break;
         }
 
     }
@@ -243,10 +289,10 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
-        public void setAlias(String id) {
+        public void Alias(String uid) {
             //传id过来，设置别名
-//            Toast.makeText(MainActivity.this, "别名"+id, Toast.LENGTH_LONG).show();
-            JPushInterface.setAlias(MainActivity.this, id, null);
+            JPushInterface.setAlias(MainActivity.this, uid, null);
+            SPUtils.PutUid(MainActivity.this,uid);
         }
 
         /*
@@ -265,6 +311,7 @@ public class MainActivity extends Activity {
                 final String tradeNo = jsonObject.getString("tradeNo");
                 final String totalFee = jsonObject.getString("totalFee");
                 final String body = jsonObject.getString("body");
+                String notifyUrl = jsonObject.getString("notifyUrl");
                 final String noncestr = UtilTool.genNonceStr();
                 final String ipAddress = UtilTool.getIpAddress();
                 List<NameValuePair> packageParams = new LinkedList<NameValuePair>();
@@ -272,7 +319,7 @@ public class MainActivity extends Activity {
                 packageParams.add(new BasicNameValuePair("body", body));
                 packageParams.add(new BasicNameValuePair("mch_id", Sharedparms.weixinInfo.WINXIN_PARTNERID));
                 packageParams.add(new BasicNameValuePair("nonce_str", noncestr));
-                packageParams.add(new BasicNameValuePair("notify_url", "http://jy.jnoo.com/notifywxapp.php"));
+                packageParams.add(new BasicNameValuePair("notify_url", notifyUrl));
                 packageParams.add(new BasicNameValuePair("out_trade_no", tradeNo));
                 packageParams.add(new BasicNameValuePair("spbill_create_ip", ipAddress));
                 packageParams.add(new BasicNameValuePair("total_fee", totalFee));
@@ -419,15 +466,15 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void shareWechat(String type, String title, String desc, String imgurl, String fulllink) {
             if (type.equalsIgnoreCase("1")) {
-                showShare(Wechat.NAME, title, null, desc, imgurl, fulllink, null, null);
+               ShareUtils.showShare(MainActivity.this,Wechat.NAME, title,  desc, imgurl, fulllink);
             } else {
-                showShare(WechatMoments.NAME, title, null, desc, imgurl, fulllink, null, null);
+                ShareUtils.showShare(MainActivity.this,WechatMoments.NAME, title,  desc, imgurl, fulllink);
             }
         }
 
         @JavascriptInterface
         public void shareWeibo(String title, String url, String imageUrl) {
-            shareSinaWei(title + url, imageUrl);
+            ShareUtils.shareSinaWei(MainActivity.this,title + url, imageUrl,false);
         }
 
         /**
@@ -441,10 +488,10 @@ public class MainActivity extends Activity {
         public void shareQQ(String type, String url, String title, String imageUrl, String appName, String description) {
             if (type.equalsIgnoreCase("1")) {
                 //qq
-                MainActivity.this.shareQQ(description, url, imageUrl);
+                ShareUtils.shareQQ(MainActivity.this,description, url, imageUrl,false);
             } else {
                 //qq空间
-                shareQZone(description, url, imageUrl, appName);
+                ShareUtils.shareQZone(MainActivity.this,description, url, imageUrl, appName,false);
             }
         }
 
@@ -550,133 +597,5 @@ public class MainActivity extends Activity {
         }
     }
 
-    /**
-     * 微信分享
-     *
-     * @param platform  类型
-     * @param title
-     * @param titleUrl  标题url
-     * @param text      imageUrl  图片url
-     * @param wechatUrl url仅在微信（包括好友和朋友圈）中使用wechatUrl
-     *                  commentText   comment是我对这条分享的评论，仅在人人网和QQ空间使用
-     */
-    private void showShare(String platform, String title, String titleUrl, String text, String imageUrl, String wechatUrl, String commentText, String appname) {
-        final OnekeyShare oks = new OnekeyShare();
-        //指定分享的平台，如果为空，还是会调用九宫格的平台列表界面
-        if (platform != null) {
-            oks.setPlatform(platform);
-        }
-        //关闭sso授权
-        oks.disableSSOWhenAuthorize();
-        // title标题，印象笔记、邮箱、信息、微信、人人网和QQ空间使用
-        oks.setTitle(title);
-        // text是分享文本，所有平台都需要这个字段
-        oks.setText(text);
-        //分享网络图片，新浪微博分享网络图片需要通过审核后申请高级写入接口，否则请注释掉测试新浪微博
-        oks.setImageUrl(imageUrl);
-        // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
-//        oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
-        // url仅在微信（包括好友和朋友圈）中使用wechatUrl
-        oks.setUrl(wechatUrl);
 
-        //启动分享
-        oks.show(this);
-    }
-
-    /**新浪微博分享
-     * @param text
-     * @param imageUrl
-     */
-    public void shareSinaWei(String text, String imageUrl) {
-        SinaWeibo.ShareParams sp = new SinaWeibo.ShareParams();
-        sp.setText(text);
-        sp.setImageUrl(imageUrl);
-
-        Platform weibo = ShareSDK.getPlatform(SinaWeibo.NAME);
-        weibo.setPlatformActionListener(new PlatformActionListener() {
-            @Override
-            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-                Toast.makeText(MainActivity.this, "分享成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(Platform platform, int i, Throwable throwable) {
-                Toast.makeText(MainActivity.this, "分享失败", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancel(Platform platform, int i) {
-                Toast.makeText(MainActivity.this, "分享取消", Toast.LENGTH_SHORT).show();
-            }
-        }); // 设置分享事件回调
-// 执行图文分享
-        weibo.share(sp);
-    }
-
-    /**
-     * qq分享
-     *
-     * @param text
-     * @param url
-     * @param imageUrl
-     */
-    public void shareQQ(String text, String url, String imageUrl) {
-        QQ.ShareParams sp = new QQ.ShareParams();
-        sp.setText(text);
-        sp.setImageUrl(imageUrl);
-        sp.setTitleUrl(url);
-        Platform weibo = ShareSDK.getPlatform(QQ.NAME);
-        weibo.setPlatformActionListener(new PlatformActionListener() {
-            @Override
-            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-                Toast.makeText(MainActivity.this, "分享成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(Platform platform, int i, Throwable throwable) {
-                Toast.makeText(MainActivity.this, "分享失败", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancel(Platform platform, int i) {
-                Toast.makeText(MainActivity.this, "分享取消", Toast.LENGTH_SHORT).show();
-            }
-        }); // 设置分享事件回调
-// 执行图文分享
-        weibo.share(sp);
-    }
-
-    /**
-     * qq空间分享
-     *
-     * @param text
-     * @param url
-     * @param imageUrl
-     */
-    public void shareQZone(String text, String url, String imageUrl, String appName) {
-        QZone.ShareParams sp = new QZone.ShareParams();
-        sp.setText(text);
-        sp.setImageUrl(imageUrl);
-        sp.setTitleUrl(url);
-        sp.setSite(appName);
-        Platform weibo = ShareSDK.getPlatform(QZone.NAME);
-        weibo.setPlatformActionListener(new PlatformActionListener() {
-            @Override
-            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-                Toast.makeText(MainActivity.this, "分享成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(Platform platform, int i, Throwable throwable) {
-                Toast.makeText(MainActivity.this, "分享失败", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancel(Platform platform, int i) {
-                Toast.makeText(MainActivity.this, "分享取消", Toast.LENGTH_SHORT).show();
-            }
-        }); // 设置分享事件回调
-// 执行图文分享
-        weibo.share(sp);
-    }
 }

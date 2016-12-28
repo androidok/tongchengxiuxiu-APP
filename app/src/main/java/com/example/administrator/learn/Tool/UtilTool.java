@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import android.util.Xml;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.conn.util.InetAddressUtils;
@@ -271,6 +272,15 @@ public class UtilTool {
     public static String getRanDomNum(){
         Random random=new Random();
         return String.valueOf(random.nextInt(30));
+
+    }
+
+    /**toast
+     * @param context
+     * @param str
+     */
+    public static void  ShowToast(Context context,String str){
+        Toast.makeText(context,str,Toast.LENGTH_SHORT).show();
 
     }
 }

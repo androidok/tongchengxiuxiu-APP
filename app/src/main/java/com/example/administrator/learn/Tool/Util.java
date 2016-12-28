@@ -3,6 +3,9 @@ package com.example.administrator.learn.Tool;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -28,9 +31,11 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -403,4 +408,6 @@ public class Util {
 		}
 		return ip;
 	}
+
+
 }

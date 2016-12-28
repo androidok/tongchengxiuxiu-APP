@@ -6,6 +6,29 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               tools:context="com.example.administrator.learn.MainActivity">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="开始推流"
+            android:layout_width="wrap_content"
+            android:id="@+id/btn_pushflow"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:text="Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/btn_paishe"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/btn_pushflow"
+            android:layout_toEndOf="@+id/btn_pushflow"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"/>
+    </RelativeLayout>
+
+
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"

@@ -5,6 +5,8 @@ package com.example.administrator.learn.Tool;
  */
 
 public class Sharedparms {
+    public static int statusSuccess = 1;//接口回调成功
+
     /*
     网页
     * */
@@ -21,16 +23,16 @@ public class Sharedparms {
         public static String WEIXIN_APPID = "wx7c35ac6495868a48";
         public static String WINXIN_SECRET = "ec9423ddc4c6ec73395f0da8de91afbd";
         //商户号
-        public static String WINXIN_PARTNERID="1359749402";
+        public static String WINXIN_PARTNERID = "1359749402";
         //key
-        public static String WEIXIN_KEY="641e3e03a32cfced53af2bacab970da8";
+        public static String WEIXIN_KEY = "641e3e03a32cfced53af2bacab970da8";
         //统一下单生成订单的接口
-        public static String WEIXIN_API="https://api.mch.weixin.qq.com/pay/unifiedorder";
+        public static String WEIXIN_API = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
     }
 
     /**
-     *支付宝支付信息
+     * 支付宝支付信息
      */
     public static class PayInfo {
         // 商户PID
@@ -40,4 +42,35 @@ public class Sharedparms {
         // 支付宝公钥
         public static final String RSA_PUBLIC = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRAFljhNhgPdyPuBV64bfQNN1PjbCzkIM6qRdKBoLPXmKKMiFYnkd6rAoprih3/PrQEB/VsW8OoM8fxn67UDYuyBTqA23MML9q1+ilIZwBC2AQ2UBVOrFXfFl75p6/B5KsiNG9zpgmLCUYuLkxpLQIDAQAB";
     }
+
+    /**
+     * 接口
+     */
+    public static class Http_url {
+        public static final String URL_DOMAIN = "http://jy.leejia.cn";//域名
+        //上传图片
+        public static final String POSTPICTURE = "/index.php?s=/Live/Api/uploadImg/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf/";//上传照片
+        //获取用户信息
+        public static final String GETPERSONAL = "/index.php?s=/Live/Api/getUserInfo/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf/";
+        //开始直播
+        public static final String STARTPUSH = "/index.php?s=/Live/Api/saveLiveData/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf/";
+    }
+
+    /*
+    * sp保存信息
+    * */
+    public static class spinfo {
+        public static final String APPINFO = "appinfo";
+        public static final String UID = "uid";
+        public static final String LIVE_RTMP = "live_rtmp";//推流地址
+        public static final String NICE_NAME = "nice_name";//用户昵称
+        public static final String USER_ACCOUNT = "user_account";//用户登入账号
+        public static final String HEADER_URL = "headerurl";//头像url
+        public static final String SHARE_URL = "share_url";//分享地址
+        public static final String IMAGE_URL = "image_url";//接口返回 封面照片地址
+
+
+    }
+
+
 }
