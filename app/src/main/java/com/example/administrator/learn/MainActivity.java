@@ -395,7 +395,6 @@ public class MainActivity extends Activity {
                     req.sign = UtilTool.genPackageSign(signParams);
                     // 在支付之前，如果应用没有注册到微信，应该先调用IWXMsg.registerApp将应用注册到微信
                     boolean b = api.sendReq(req);
-                    Log.d("微信支付", "b" + b);
                 } else {
                     Log.e("微信支付", "服务器请求错误");
 
@@ -466,15 +465,15 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void shareWechat(String type, String title, String desc, String imgurl, String fulllink) {
             if (type.equalsIgnoreCase("1")) {
-               ShareUtils.showShare(MainActivity.this,Wechat.NAME, title,  desc, imgurl, fulllink);
+               ShareUtils.shareweixin(MainActivity.this, title,  desc, imgurl, fulllink,false,null);
             } else {
-                ShareUtils.showShare(MainActivity.this,WechatMoments.NAME, title,  desc, imgurl, fulllink);
+                ShareUtils.shareWechatMoments(MainActivity.this, title,  desc, imgurl, fulllink,false,null);
             }
         }
 
         @JavascriptInterface
         public void shareWeibo(String title, String url, String imageUrl) {
-            ShareUtils.shareSinaWei(MainActivity.this,title + url, imageUrl,false);
+            ShareUtils.shareSinaWei(MainActivity.this,title + url, imageUrl,false,null);
         }
 
         /**
@@ -488,10 +487,10 @@ public class MainActivity extends Activity {
         public void shareQQ(String type, String url, String title, String imageUrl, String appName, String description) {
             if (type.equalsIgnoreCase("1")) {
                 //qq
-                ShareUtils.shareQQ(MainActivity.this,description, url, imageUrl,false);
+                ShareUtils.shareQQ(MainActivity.this,description, url, imageUrl,false,null);
             } else {
                 //qq空间
-                ShareUtils.shareQZone(MainActivity.this,description, url, imageUrl, appName,false);
+                ShareUtils.shareQZone(MainActivity.this,description, url, imageUrl, appName,false,null);
             }
         }
 
@@ -505,11 +504,9 @@ public class MainActivity extends Activity {
                     String resultStatus = substring.substring(1, substring.length() - 1);
                     if ("9000".equalsIgnoreCase(resultStatus)) {
                         mwebview.loadUrl("javascript:success(" + resultStatus + ")");
-//                        Toast.makeText(MainActivity.this, "支付成功", Toast.LENGTH_SHORT).show();
                     } else {
                         mwebview.loadUrl("javascript:error(" + resultStatus + ")");
                     }
-//                        Toast.makeText(MainActivity.this,""+resultStatus,Toast.LENGTH_SHORT).show();
                 } else if (msg.what == WEIXIN_PAY) {//微信支付
                     Map<String, String> map = (Map<String, String>) msg.obj;
                     String prepay_id = map.get("prepay_id");

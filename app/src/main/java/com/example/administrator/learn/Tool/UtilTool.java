@@ -283,4 +283,36 @@ public class UtilTool {
         Toast.makeText(context,str,Toast.LENGTH_SHORT).show();
 
     }
+    /**
+     * 计算时间差   传入的是毫秒数
+     *
+     * @param starTime
+     *            开始时间
+     * @param endTime
+     *            结束时间
+     * @param
+     *             ==1----天，时，分。 ==2----时
+     * @return 返回时间差
+     */
+    public static String getTimeDifference(String starTime, String endTime) {
+        String timeString = "";
+
+        long longend = Long.parseLong(endTime);
+        long longstart = Long.parseLong(starTime);
+        if (longend <= longstart|| (longend-longstart)<1000) {
+            return "0小时0分0秒";
+        }
+
+        long diff = longend - longstart;
+
+        long day = diff / (24 * 60 * 60 * 1000);
+        long hour = (diff / (60 * 60 * 1000) - day * 24);
+        long min = ((diff / (60 * 1000)) - day * 24 * 60 - hour * 60);
+        long s = (diff / 1000 - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
+        long hour1 = diff / (60 * 60 * 1000);
+        timeString = hour + "小时" + min + "分"+s+"秒";
+
+        return timeString;
+
+    }
 }

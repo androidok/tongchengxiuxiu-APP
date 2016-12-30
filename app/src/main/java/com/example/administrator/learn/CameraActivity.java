@@ -2,7 +2,6 @@ package com.example.administrator.learn;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
@@ -26,9 +25,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidnetworking.common.Priority;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.administrator.learn.Model.PersonalInfo;
@@ -39,8 +35,6 @@ import com.example.administrator.learn.Tool.CameraPreview;
 import com.example.administrator.learn.Tool.SPUtils;
 import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.UtilTool;
-import com.google.gson.reflect.TypeToken;
-import com.rxandroidnetworking.RxAndroidNetworking;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -49,14 +43,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-import static android.R.attr.path;
 import static android.R.attr.type;
 
 public class CameraActivity extends Activity implements View.OnTouchListener {
@@ -162,6 +153,7 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
         layoutButtonLayoutParams.height = height * 1 / 3;
         layoutButtonLayoutParams.width = width;
         layoutButton.setLayoutParams(layoutButtonLayoutParams);
+
     }
 
     @OnClick({R.id.layout_back, R.id.image_camerafan, R.id.btn_camera, R.id.tv_cancel, R.id.tv_save})
@@ -182,6 +174,9 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
                 try {
                     camera = Camera.open(mCurrentCameraId);
                     camera.setPreviewDisplay(surfaceView.getHolder());
+                    Camera.Parameters parameters = camera.getParameters();
+                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);//连续对焦
+                    camera.setParameters(parameters);
                     preview.setCamera(camera);
                     camera.startPreview();
                 } catch (Exception e) {
@@ -343,6 +338,9 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
             try {
                 mCurrentCameraId = 0;
                 camera = Camera.open(mCurrentCameraId);
+                Camera.Parameters parameters = camera.getParameters();
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);//自动对焦
+                camera.setParameters(parameters);
                 camera.startPreview();
                 preview.setCamera(camera);
                 preview.reAutoFocus();

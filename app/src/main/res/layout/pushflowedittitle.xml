@@ -29,18 +29,27 @@
             android:layout_toStartOf="@+id/image_xx"
             android:background="@mipmap/camera_resvise"/>
     </RelativeLayout>
-
-    <EditText
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
         android:layout_marginTop="120dp"
-        android:background="@null"
-        android:gravity="center"
-        android:text="给你的直播写个标题吧"
-        android:textColor="#ffffff"
-        android:id="@+id/ed_title"/>
+        android:background="#55cccccc"
+        android:layout_height="50dp">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:hint="给你的直播写个标题吧"
+            android:textColor="#ffffff"
+            android:id="@+id/ed_title"/>
+    </RelativeLayout>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -15,6 +15,10 @@ public class Sharedparms {
     * webview的设置useragent，但是后面需要加入版本号
     * */
     public static String WEBVIEWA_AGENT = "app.Jnoo.com/";
+    /*
+    * 直播那个黑白页
+    * */
+    public static String WEBPUSH = "http://jy.leejia.cn/index.php?s=/Live/Index/mylive";
 
     /**
      * 微信appid和appidsecret
@@ -54,6 +58,10 @@ public class Sharedparms {
         public static final String GETPERSONAL = "/index.php?s=/Live/Api/getUserInfo/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf/";
         //开始直播
         public static final String STARTPUSH = "/index.php?s=/Live/Api/saveLiveData/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf/";
+        //分享完成告诉后台
+        public static final String SHAREURL = "/index.php?s=/Live/Api/shareLive/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf/";
+        //结束直播
+        public static final String STOPPUSH = "/index.php?s=/Live/Api/overLive/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf";
     }
 
     /*
@@ -68,6 +76,7 @@ public class Sharedparms {
         public static final String HEADER_URL = "headerurl";//头像url
         public static final String SHARE_URL = "share_url";//分享地址
         public static final String IMAGE_URL = "image_url";//接口返回 封面照片地址
+        public static final String LIVEID = "liveid";
 
 
     }

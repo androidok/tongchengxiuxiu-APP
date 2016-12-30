@@ -113,6 +113,21 @@ public class SPUtils {
     public static void Putimage_url(Context context,String image_url){
         context.getSharedPreferences(Sharedparms.spinfo.APPINFO,0).edit().putString(Sharedparms.spinfo.IMAGE_URL,image_url).commit();
     }
+    /**得到liveid
+     * @param context
+     * @return
+     */
+    public static String getliveid(Context context){
+        return context.getSharedPreferences(Sharedparms.spinfo.APPINFO,0).getString(Sharedparms.spinfo.LIVEID,null);
+    }
+
+    /**保存liveid
+     * @param context
+     * @param liveid
+     */
+    public static void Putliveid(Context context,String liveid){
+        context.getSharedPreferences(Sharedparms.spinfo.APPINFO,0).edit().putString(Sharedparms.spinfo.LIVEID,liveid).commit();
+    }
 
 
 }

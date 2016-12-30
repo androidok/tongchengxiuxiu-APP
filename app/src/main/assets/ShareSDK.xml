@@ -100,13 +100,13 @@
         AppSecret="ec9423ddc4c6ec73395f0da8de91afbd"
         BypassApproval="false"
         Enable="true" />
-    
+	<!--BypassApproval 设置是否为绕过审核分享, 最好是false-->
     <WechatMoments
         Id="5"
         SortId="5"
         AppId="wx7c35ac6495868a48"
         AppSecret="ec9423ddc4c6ec73395f0da8de91afbd"
-        BypassApproval="true"
+        BypassApproval="false"
         Enable="true" />
         
 	<WechatFavorite
