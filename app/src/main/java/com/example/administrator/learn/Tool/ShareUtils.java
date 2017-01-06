@@ -3,14 +3,11 @@ package com.example.administrator.learn.Tool;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.example.administrator.learn.MainActivity;
-
 import java.util.HashMap;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.ShareSDK;
-import cn.sharesdk.onekeyshare.OnekeyShare;
 import cn.sharesdk.sina.weibo.SinaWeibo;
 import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.tencent.qzone.QZone;
@@ -91,11 +88,17 @@ public class ShareUtils {
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
                 UtilTool.ShowToast(context, "分享失败");
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
 
             @Override
             public void onCancel(Platform platform, int i) {
                 UtilTool.ShowToast(context, "分享取消");
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
         }); // 设置分享事件回调
         if (!weixin.isClientValid()) {
@@ -135,11 +138,17 @@ public class ShareUtils {
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
                 UtilTool.ShowToast(context, "分享失败");
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
 
             @Override
             public void onCancel(Platform platform, int i) {
                 UtilTool.ShowToast(context, "分享取消");
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
         }); // 设置分享事件回调
         if (!weixinfriead.isClientValid()) {
@@ -171,11 +180,17 @@ public class ShareUtils {
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
                 Toast.makeText(context, "分享失败", Toast.LENGTH_SHORT).show();
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
 
             @Override
             public void onCancel(Platform platform, int i) {
                 Toast.makeText(context, "分享取消", Toast.LENGTH_SHORT).show();
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
         }); // 设置分享事件回调
 // 执行图文分享
@@ -207,11 +222,17 @@ public class ShareUtils {
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
                 Toast.makeText(context, "分享失败", Toast.LENGTH_SHORT).show();
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
 
             @Override
             public void onCancel(Platform platform, int i) {
                 Toast.makeText(context, "分享取消", Toast.LENGTH_SHORT).show();
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
         }); // 设置分享事件回调
 // 执行图文分享
@@ -244,11 +265,17 @@ public class ShareUtils {
             @Override
             public void onError(Platform platform, int i, Throwable throwable) {
                 Toast.makeText(context, "分享失败", Toast.LENGTH_SHORT).show();
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
 
             @Override
             public void onCancel(Platform platform, int i) {
                 Toast.makeText(context, "分享取消", Toast.LENGTH_SHORT).show();
+                if (setShareListener != null) {
+                    setShareListener.shareSuccess(true, iscallback);
+                }
             }
         }); // 设置分享事件回调
 // 执行图文分享

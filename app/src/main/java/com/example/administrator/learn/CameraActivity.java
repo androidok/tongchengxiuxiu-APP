@@ -109,11 +109,10 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
             @Override
             public void onResponseResult(PersonalInfo response) {
                 if (response.getStatus() == Sharedparms.statusSuccess) {
-                    SPUtils.PutlivertmpUrl(CameraActivity.this, response.getData().getLive_url());
+                    SPUtils.PutlivertmpUrl(CameraActivity.this, response.getData().getLive_rtmp());
                     SPUtils.PutNiceName(CameraActivity.this, response.getData().getUser_nicename());
                     SPUtils.PutUserAccount(CameraActivity.this, response.getData().getUser_login());
                     SPUtils.Putheader_url(CameraActivity.this, response.getData().getAvatar());
-//                            SPUtils.Putshare_url(CameraActivity.this,response.getData().get);
                 } else {
                     UtilTool.ShowToast(CameraActivity.this, response.getMsg());
                     finish();
@@ -123,7 +122,7 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
 
             @Override
             public void _OnError(String errormessage) {
-
+                UtilTool.ShowToast(CameraActivity.this, errormessage);
             }
         });
     }
@@ -174,17 +173,15 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
                 try {
                     camera = Camera.open(mCurrentCameraId);
                     camera.setPreviewDisplay(surfaceView.getHolder());
-                    Camera.Parameters parameters = camera.getParameters();
-                    parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);//连续对焦
-                    camera.setParameters(parameters);
-                    preview.setCamera(camera);
+                    UtilTool.ShowToast(this,mCurrentCameraId+"");
                     camera.startPreview();
+                    preview.setCamera(camera);
+                    preview.reAutoFocus();
                 } catch (Exception e) {
-                    UtilTool.ShowToast(this, "未发现相机");
+                    UtilTool.ShowToast(this, "11未发现相机"+e.getMessage());
                 }
                 break;
             case R.id.btn_camera://拍照
-
                 try {
                     camera.takePicture(null, null, jpegCallback);
 
@@ -211,6 +208,7 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
     Camera.PictureCallback jpegCallback = new Camera.PictureCallback() {
         public void onPictureTaken(byte[] data, Camera camera) {
             progressDialog = ProgressDialog.show(CameraActivity.this, null, "处理中");
+            progressDialog.setCanceledOnTouchOutside(true);
             new SaveImageTask(data).execute();
             resetCam();
         }
@@ -285,6 +283,7 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
         ApiService.putPicture(path, new ApiService.ParsedRequestListener<putPictureInfo>() {
             @Override
             public void onResponseResult(putPictureInfo response) {
+
                 progressDialog.dismiss();
                 if (response.getStatus() == Sharedparms.statusSuccess) {
                     SPUtils.Putimage_url(CameraActivity.this,response.getData().getUrl());
@@ -338,14 +337,11 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
             try {
                 mCurrentCameraId = 0;
                 camera = Camera.open(mCurrentCameraId);
-                Camera.Parameters parameters = camera.getParameters();
-                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);//自动对焦
-                camera.setParameters(parameters);
                 camera.startPreview();
                 preview.setCamera(camera);
                 preview.reAutoFocus();
             } catch (RuntimeException ex) {
-                Toast.makeText(this, "未发现相机", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "222未发现相机"+ex.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
 
@@ -399,6 +395,9 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
         // 获得图片大小
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
+        options.inSampleSize = 8;
+        options.inInputShareable = true;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
         BitmapFactory.decodeByteArray(data, 0, data.length, options);
         // PHOTO_SIZE = options.outHeight > options.outWidth ? options.outWidth
         // : options.outHeight;
@@ -424,13 +423,23 @@ public class CameraActivity extends Activity implements View.OnTouchListener {
     // 保存图片文件
     public static String saveToFile(Bitmap croppedImage)
             throws FileNotFoundException, IOException {
-        File sdCard = Environment.getExternalStorageDirectory();
-        File dir = new File(sdCard.getAbsolutePath() + "/DCIM/Camera/meituxiuxiu/");
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        File file=null;
+        //判断是否有sd卡
+//        if (Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED) && Util.checkSDStatus(1)){
+            File sdCard = Environment.getExternalStorageDirectory();
+             file = new File(sdCard.getAbsolutePath() + "/DCIM/Camera/meituxiuxiu/");
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+//        }
+// else {
+//            if (!neiFile.exists()){
+//                file.mkdirs();
+//            }
+//        }
+
         String fileName = getCameraPath();
-        File outFile = new File(dir, fileName);
+        File outFile = new File(file, fileName);
         FileOutputStream outputStream = new FileOutputStream(outFile); // 文件输出流
         croppedImage.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
         outputStream.flush();

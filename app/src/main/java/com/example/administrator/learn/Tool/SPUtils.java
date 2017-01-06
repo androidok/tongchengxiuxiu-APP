@@ -31,7 +31,7 @@ public class SPUtils {
         return context.getSharedPreferences(Sharedparms.spinfo.APPINFO,0).getString(Sharedparms.spinfo.LIVE_RTMP,null);
     }
 
-    /**保存uid
+    /**保存推流地址
      * @param context
      * @param livertmpUrl
      */

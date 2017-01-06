@@ -3,22 +3,25 @@ package com.example.administrator.learn;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.alipay.sdk.app.PayTask;
+import com.example.administrator.learn.Model.PersonalInfo;
+import com.example.administrator.learn.Model.putPictureInfo;
+import com.example.administrator.learn.ServceTool.ApiService;
 import com.example.administrator.learn.Tool.EvenbusInfo;
 import com.example.administrator.learn.Tool.SPUtils;
 import com.example.administrator.learn.Tool.ShareUtils;
@@ -26,6 +29,7 @@ import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.SignUtils;
 import com.example.administrator.learn.Tool.Util;
 import com.example.administrator.learn.Tool.UtilTool;
+import com.example.administrator.learn.Tool.YImagePicker;
 import com.example.administrator.learn.Tool.evenbus_push;
 import com.tencent.mm.sdk.modelpay.PayReq;
 import com.tencent.mm.sdk.openapi.IWXAPI;
@@ -47,33 +51,23 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnClick;
 import cn.jpush.android.api.JPushInterface;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.PlatformDb;
 import cn.sharesdk.framework.ShareSDK;
-import cn.sharesdk.onekeyshare.OnekeyShare;
-import cn.sharesdk.sina.weibo.SinaWeibo;
-import cn.sharesdk.tencent.qq.QQ;
-import cn.sharesdk.tencent.qzone.QZone;
 import cn.sharesdk.wechat.friends.Wechat;
-import cn.sharesdk.wechat.moments.WechatMoments;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements YImagePicker.OnImagePickedListener {
 
-    @InjectView(R.id.btn_pushflow)
-    Button btnPushflow;
-    @InjectView(R.id.btn_paishe)
-    Button btnPaishe;
     private WebView mwebview;
     private static final int MSG_WEIXIN_SCUSSE = 1;
     private static final int MSG_WEIXIN_ERROR = 2;
     private static int SDK_PAY_FLAG = 3;
     private static int WEIXIN_PAY = 4;//
     public static MainActivity mainActivity;
+    private YImagePicker imagePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +76,7 @@ public class MainActivity extends Activity {
         ButterKnife.inject(this);
         mwebview = (WebView) findViewById(R.id.webView);
         EventBus.getDefault().register(this);
+        imagePicker = new YImagePicker(this, this);
         this.mainActivity = this;
         mwebview.setWebViewClient(new WebViewClient() {
             @Override
@@ -180,6 +175,7 @@ public class MainActivity extends Activity {
                     PlatformDb db = platform.getDb();
                     try {
                         JSONObject jsonObject = new JSONObject(db.exportData());
+                        Log.e("微信登录信息", "" + jsonObject.toString());
                         mwebview.loadUrl("javascript:success(" + jsonObject + ")");
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -245,36 +241,104 @@ public class MainActivity extends Activity {
         }
 
     }
+    /**
+     * 上传照片
+     */
+    private void putPicture(String path) {
+       final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, "", "开始直播，稍等...");
+        ApiService.putPicture(path, new ApiService.ParsedRequestListener<putPictureInfo>() {
+            @Override
+            public void onResponseResult(putPictureInfo response) {
+                progressDialog.dismiss();
+                if (response.getStatus() == Sharedparms.statusSuccess) {
+                    SPUtils.Putimage_url(MainActivity.this,response.getData().getUrl());
+                    pushFlow();
+                } else {
+                    UtilTool.ShowToast(MainActivity.this, response.getMsg());
+                }
+            }
 
-    @OnClick({R.id.btn_pushflow, R.id.btn_paishe})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_pushflow:
-                   /*开始推流*/
-                PushFlowActivity.RequestBuilder builder = new PushFlowActivity.RequestBuilder()
-                        .bestBitrate(600)
-                        .cameraFacing(1)//是否前置摄像头  1前面  0后面
-                        .dx(14)//marginx
-                        .dy(14)
-                        .site(1)//水印位置
-                        .rtmpUrl("rtmp://video-center.alivecdn.com/shanmao1/259725?vhost=live.jnoo.com")//rtmp服务器地址
-                        .videoResolution(360)
-                        .portrait(false)//是否横屏
-                        //.watermarkUrl("assets:///spalsh.png")// 水印图片路径
-                        //.watermarkUrl("assets://qupai-logo.png")
-                        .minBitrate(500)//帧率
-                        .maxBitrate(800)
-                        .frameRate(600)
-                        .initBitrate(800);
-                PushFlowActivity.startActivity(view.getContext(), builder);
-                break;
-            case R.id.btn_paishe:
+            @Override
+            public void _OnError(String errormessage) {
+                UtilTool.ShowToast(MainActivity.this,errormessage);
+                progressDialog.dismiss();
+            }
+        });
 
-                startActivity(new Intent(this,CameraActivity.class));
-                break;
-        }
 
     }
+    private void pushFlow() {
+        String livertmpUrl = SPUtils.getlivertmpUrl(MainActivity.this);
+         /*开始推流*/
+        PushFlowActivity.RequestBuilder builder = new PushFlowActivity.RequestBuilder()
+                .bestBitrate(600)
+                .cameraFacing(1)//是否前置摄像头  1前面  0后面
+                .dx(14)//marginx
+                .dy(14)
+                .site(1)//水印位置
+                .rtmpUrl(livertmpUrl)//rtmp服务器地址
+                .videoResolution(360)
+                .portrait(false)//是否横屏
+                //.watermarkUrl("assets:///spalsh.png")// 水印图片路径
+                //.watermarkUrl("assets://qupai-logo.png")
+                .minBitrate(500)//帧率
+                .maxBitrate(800)
+                .frameRate(600)
+                .initBitrate(800);
+        PushFlowActivity.startActivity(this, builder);
+    }
+    /**
+     * 获取个人信息
+     */
+    private void getPersonalinfo() {
+        String uid = SPUtils.getUid(this);
+        if (TextUtils.isEmpty(uid)) {
+            UtilTool.ShowToast(this, "个人信息获取失败");
+            return;
+        }
+        ApiService.getPersonnalInfo(uid, new ApiService.ParsedRequestListener<PersonalInfo>() {
+            @Override
+            public void onResponseResult(PersonalInfo response) {
+                if (response.getStatus() == Sharedparms.statusSuccess) {
+                    SPUtils.PutlivertmpUrl(MainActivity.this, response.getData().getLive_rtmp());
+                    SPUtils.PutNiceName(MainActivity.this, response.getData().getUser_nicename());
+                    SPUtils.PutUserAccount(MainActivity.this, response.getData().getUser_login());
+                    SPUtils.Putheader_url(MainActivity.this, response.getData().getAvatar());
+                    //去拍照
+                    imagePicker.startImagePickFromCamera();
+                } else {
+                    UtilTool.ShowToast(MainActivity.this, response.getMsg());
+                }
+            }
+
+            @Override
+            public void _OnError(String errormessage) {
+                UtilTool.ShowToast(MainActivity.this, errormessage);
+            }
+        });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        imagePicker.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onImagePicked(Bitmap bitmap, int requestCode, Intent data, Uri originalUri, String path) {
+        UtilTool.ShowToast(this, path);
+        putPicture(path);
+    }
+
+    @Override
+    public void onImageCroped(Bitmap bm) {
+
+    }
+
+    @Override
+    public void onPickFail(Exception e) {
+
+    }
+
 
     public class javaScriptObjcet {
 
@@ -292,7 +356,8 @@ public class MainActivity extends Activity {
         public void Alias(String uid) {
             //传id过来，设置别名
             JPushInterface.setAlias(MainActivity.this, uid, null);
-            SPUtils.PutUid(MainActivity.this,uid);
+            SPUtils.PutUid(MainActivity.this, uid);
+            UtilTool.ShowToast(MainActivity.this, uid);
         }
 
         /*
@@ -465,15 +530,15 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void shareWechat(String type, String title, String desc, String imgurl, String fulllink) {
             if (type.equalsIgnoreCase("1")) {
-               ShareUtils.shareweixin(MainActivity.this, title,  desc, imgurl, fulllink,false,null);
+                ShareUtils.shareweixin(MainActivity.this, title, desc, imgurl, fulllink, false, null);
             } else {
-                ShareUtils.shareWechatMoments(MainActivity.this, title,  desc, imgurl, fulllink,false,null);
+                ShareUtils.shareWechatMoments(MainActivity.this, title, desc, imgurl, fulllink, false, null);
             }
         }
 
         @JavascriptInterface
         public void shareWeibo(String title, String url, String imageUrl) {
-            ShareUtils.shareSinaWei(MainActivity.this,title + url, imageUrl,false,null);
+            ShareUtils.shareSinaWei(MainActivity.this, title + url, imageUrl, false, null);
         }
 
         /**
@@ -487,11 +552,21 @@ public class MainActivity extends Activity {
         public void shareQQ(String type, String url, String title, String imageUrl, String appName, String description) {
             if (type.equalsIgnoreCase("1")) {
                 //qq
-                ShareUtils.shareQQ(MainActivity.this,description, url, imageUrl,false,null);
+                ShareUtils.shareQQ(MainActivity.this, description, url, imageUrl, false, null);
             } else {
                 //qq空间
-                ShareUtils.shareQZone(MainActivity.this,description, url, imageUrl, appName,false,null);
+                ShareUtils.shareQZone(MainActivity.this, description, url, imageUrl, appName, false, null);
             }
+        }
+
+        /**
+         * 开始直播
+         */
+        @JavascriptInterface
+        public void livelist() {
+//            startActivity(new Intent(MainActivity.this,CameraActivity.class));
+            getPersonalinfo();
+
         }
 
         Handler Mhandler = new Handler() {
@@ -502,7 +577,7 @@ public class MainActivity extends Activity {
                     String result = (String) msg.obj;
                     String substring = result.split(";")[0].split("=")[1];
                     String resultStatus = substring.substring(1, substring.length() - 1);
-                    if ("9000".equalsIgnoreCase(resultStatus)) {
+                    if ("9000" .equalsIgnoreCase(resultStatus)) {
                         mwebview.loadUrl("javascript:success(" + resultStatus + ")");
                     } else {
                         mwebview.loadUrl("javascript:error(" + resultStatus + ")");

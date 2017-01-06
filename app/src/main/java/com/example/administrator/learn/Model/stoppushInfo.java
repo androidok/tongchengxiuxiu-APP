@@ -9,12 +9,16 @@ public class stoppushInfo {
     /**
      * status : 1
      * msg : 成功
-     * data : {"start_time":"1483000733","end_time":"0","live_num":"0","live_money":"0","fx_num":"0","live_img":"http://img.jnooo.cc/dating/2016-12-28/17/e267556df30df3fb0973d1f759b09f36.png"}
+     * data : {"start_time":"1483671461","end_time":"1483672038","live_num":"1","live_money":"0","fx_num":"0","live_img":"http://img.jnooo.cc/dating/2017-01-06/10/b535ecf95dcd462ed113ab30f3f41ce0.jpeg","live_time":"0小时9分37秒"}
      */
 
     private int status;
     private String msg;
     private DataBean data;
+
+    public int getStatus() {
+        return status;
+    }
 
     @Override
     public String toString() {
@@ -23,10 +27,6 @@ public class stoppushInfo {
                 ", msg='" + msg + '\'' +
                 ", data=" + data +
                 '}';
-    }
-
-    public int getStatus() {
-        return status;
     }
 
     public void setStatus(int status) {
@@ -51,12 +51,13 @@ public class stoppushInfo {
 
     public static class DataBean {
         /**
-         * start_time : 1483000733
-         * end_time : 0
-         * live_num : 0
+         * start_time : 1483671461
+         * end_time : 1483672038
+         * live_num : 1
          * live_money : 0
          * fx_num : 0
-         * live_img : http://img.jnooo.cc/dating/2016-12-28/17/e267556df30df3fb0973d1f759b09f36.png
+         * live_img : http://img.jnooo.cc/dating/2017-01-06/10/b535ecf95dcd462ed113ab30f3f41ce0.jpeg
+         * live_time : 0小时9分37秒
          */
 
         private String start_time;
@@ -65,6 +66,7 @@ public class stoppushInfo {
         private String live_money;
         private String fx_num;
         private String live_img;
+        private String live_time;
 
         @Override
         public String toString() {
@@ -75,6 +77,7 @@ public class stoppushInfo {
                     ", live_money='" + live_money + '\'' +
                     ", fx_num='" + fx_num + '\'' +
                     ", live_img='" + live_img + '\'' +
+                    ", live_time='" + live_time + '\'' +
                     '}';
         }
 
@@ -124,6 +127,14 @@ public class stoppushInfo {
 
         public void setLive_img(String live_img) {
             this.live_img = live_img;
+        }
+
+        public String getLive_time() {
+            return live_time;
+        }
+
+        public void setLive_time(String live_time) {
+            this.live_time = live_time;
         }
     }
 }

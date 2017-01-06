@@ -1,6 +1,6 @@
 package com.example.administrator.learn.ServceTool;
 
-import android.content.Context;
+import android.util.Log;
 
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
@@ -45,12 +45,13 @@ public class ApiService {
                 }, new com.androidnetworking.interfaces.ParsedRequestListener<PersonalInfo>() {
                     @Override
                     public void onResponse(PersonalInfo response) {
-//
+                        Log.d("获取个人信息",response.toString());
                         parsedRequestListener.onResponseResult(response);
                     }
 
                     @Override
                     public void onError(ANError anError) {
+                        Log.d("获取个人信息",anError.toString());
                     }
                 });
     }
@@ -70,12 +71,14 @@ public class ApiService {
                 }, new com.androidnetworking.interfaces.ParsedRequestListener<putPictureInfo>() {
                     @Override
                     public void onResponse(putPictureInfo response) {
+                        Log.d("上传照片",response.toString());
                         parsedRequestListener.onResponseResult(response);
 //
                     }
 
                     @Override
                     public void onError(ANError anError) {
+                        Log.d("上传照片",anError.toString());
                         parsedRequestListener._OnError(anError.getMessage());
 
                     }
@@ -103,12 +106,14 @@ public class ApiService {
                 }, new com.androidnetworking.interfaces.ParsedRequestListener<StartPushInfo>() {
                     @Override
                     public void onResponse(StartPushInfo response) {
+                        Log.d("开始直播",response.toString());
                         parsedRequestListener.onResponseResult(response);
 
                     }
 
                     @Override
                     public void onError(ANError anError) {
+                        Log.d("开始直播",anError.toString());
                         parsedRequestListener._OnError(anError.getMessage());
                     }
                 });
@@ -133,11 +138,13 @@ public class ApiService {
                 }, new com.androidnetworking.interfaces.ParsedRequestListener<apiSuccessInfo>() {
                     @Override
                     public void onResponse(apiSuccessInfo response) {
+                        Log.d("分享成功后告诉后台",response.toString());
                         parsedRequestListener.onResponseResult(response);
                     }
 
                     @Override
                     public void onError(ANError anError) {
+                        Log.d("分享成功后告诉后台",anError.toString());
                         parsedRequestListener._OnError(anError.getMessage());
                     }
                 });
@@ -162,11 +169,13 @@ public class ApiService {
                 }, new com.androidnetworking.interfaces.ParsedRequestListener<stoppushInfo>() {
                     @Override
                     public void onResponse(stoppushInfo response) {
+                        Log.d("结束直播",response.toString());
                         parsedRequestListener.onResponseResult(response);
                     }
 
                     @Override
                     public void onError(ANError anError) {
+                        Log.d("结束直播",anError.toString());
                         parsedRequestListener._OnError(anError.getMessage());
                     }
                 });

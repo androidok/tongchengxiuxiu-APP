@@ -48,7 +48,6 @@ import com.alibaba.livecloud.model.AlivcWatermark;
 import com.duanqu.qupai.logger.DataStatistics;
 import com.example.administrator.learn.Model.StartPushInfo;
 import com.example.administrator.learn.Model.apiSuccessInfo;
-import com.example.administrator.learn.Model.stoppushInfo;
 import com.example.administrator.learn.ServceTool.ApiService;
 import com.example.administrator.learn.Tool.SPUtils;
 import com.example.administrator.learn.Tool.SelecPopuview;
@@ -62,10 +61,6 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import cn.sharesdk.wechat.friends.Wechat;
-import cn.sharesdk.wechat.moments.WechatMoments;
-
-import static android.R.attr.description;
 
 /**
  *
@@ -113,9 +108,12 @@ public class PushFlowActivity extends Activity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_startpush://开始直播
-                startPush();
-//                showPopuViewDialog();
-//                shareLiveId();
+                String title = edTitle.getText().toString().trim();
+                if (TextUtils.isEmpty(title)) {
+                    UtilTool.ShowToast(PushFlowActivity.this, "标题不能为空");
+                    return;
+                }
+                startPush(title,-2,false);
                 break;
             case R.id.image_cameraresvise://设置摄像头
                 int currFacing = mMediaRecorder.switchCamera();
@@ -152,10 +150,8 @@ public class PushFlowActivity extends Activity {
         SelecPopuview picPopupWindow = new SelecPopuview(this, new SelecPopuview.setonListener() {
             @Override
             public void setonlistfener(View view, int index) {
-                UtilTool.ShowToast(PushFlowActivity.this, index + "");
                 switch (index) {
                     case SelecPopuview.WEIBO:
-                        UtilTool.ShowToast(PushFlowActivity.this, index + "");
                         ShareUtils.shareSinaWei(PushFlowActivity.this, "", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", true, setShareListener);
                         break;
                     case SelecPopuview.WEIXIN:
@@ -178,16 +174,13 @@ public class PushFlowActivity extends Activity {
 
     }
 
-    /**
-     * 开始直播
+    /**开始直播接口
+     * @param title
+     * @param index
+     * @param isShare  是否先要分享再直播
      */
-    private void startPush() {
-        String title = edTitle.getText().toString().trim();
-        if (TextUtils.isEmpty(title)) {
-            UtilTool.ShowToast(this, "标题不能为空");
-            return;
-        }
-        progressDialog = ProgressDialog.show(this, null, "");
+    private void startPush(final String title, final int index, final boolean isShare) {
+        progressDialog = ProgressDialog.show(this, null, "处理中");
         progressDialog.show();
         ApiService.StartPush(title, SPUtils.getUid(this), SPUtils.getimage_url(this), new ApiService.ParsedRequestListener<StartPushInfo>() {
             @Override
@@ -195,13 +188,15 @@ public class PushFlowActivity extends Activity {
                 progressDialog.dismiss();
                 if (StartPushInfo.getStatus() == Sharedparms.statusSuccess) {
                     SPUtils.Putliveid(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
-                    layout_startpush.setVisibility(View.GONE);
-                    layoutWebview.setVisibility(View.VISIBLE);
-                    //开始推流
-                    mMediaRecorder.startRecord(pushUrl);
-                    isRecording = true;
-
-
+                    SPUtils.Putshare_url(PushFlowActivity.this,StartPushInfo.getData().getShare_url());
+                    UtilTool.ShowToast(PushFlowActivity.this,StartPushInfo.getData().getLiveId()+"");
+                    pushWebview.loadUrl(Sharedparms.WEBPUSH+StartPushInfo.getData().getLiveId());
+                    if (isShare){
+                        //分享
+                        share(index,title,StartPushInfo.getData().getShare_url());
+                    }else {
+                        startPushAPI();
+                    }
                 } else {
                     UtilTool.ShowToast(PushFlowActivity.this, StartPushInfo.getMsg());
                 }
@@ -215,6 +210,40 @@ public class PushFlowActivity extends Activity {
             }
         });
 
+    }
+
+    /**
+     * 功能上 -开始直播
+     */
+    private void startPushAPI(){
+        //开始推流
+                    layout_startpush.setVisibility(View.GONE);
+                    layoutWebview.setVisibility(View.VISIBLE);
+                    mMediaRecorder.startRecord(pushUrl);
+                    isRecording = true;
+    }
+
+    /**分享
+     * @param index
+     */
+    private void share(int index,String title,String share_url) {
+        switch (index){
+            case WEIBO:
+                ShareUtils.shareSinaWei(PushFlowActivity.this, title, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
+                break;
+            case WEIXIN:
+                ShareUtils.shareweixin(PushFlowActivity.this, title, title, SPUtils.getimage_url(PushFlowActivity.this),share_url , false, setShareListener);
+                break;
+            case FRIEND:
+                ShareUtils.shareWechatMoments(PushFlowActivity.this, title, title, SPUtils.getimage_url(PushFlowActivity.this), share_url, false, setShareListener);
+                break;
+            case QQ:
+                ShareUtils.shareQQ(PushFlowActivity.this, title, share_url, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
+                break;
+            case QQZONE:
+                ShareUtils.shareQZone(PushFlowActivity.this, title,share_url, SPUtils.getimage_url(PushFlowActivity.this), "同城秀秀", false, setShareListener);
+                break;
+        }
     }
 
     private static final int WEIBO = 1;
@@ -238,23 +267,23 @@ public class PushFlowActivity extends Activity {
         switch (index) {
             case WEIBO:
                 imageWeibo.setImageResource(R.mipmap.weibo_selector);
-                ShareUtils.shareSinaWei(this, title, "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", false, setShareListener);
+                startPush(title,WEIBO,true);//开始直播
                 break;
             case WEIXIN:
                 imageWeixin.setImageResource(R.mipmap.wexin_selector);
-                ShareUtils.shareweixin(this, title, title, "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", "http://blog.csdn.net/liguangzhenghi/article/details/8076361", false, setShareListener);
+                startPush(title,WEIXIN,true);//开始直播
                 break;
             case FRIEND:
                 imageFriend.setImageResource(R.mipmap.friend_selector);
-                ShareUtils.shareWechatMoments(this, title, title, "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", "http://blog.csdn.net/liguangzhenghi/article/details/8076361", false, setShareListener);
+                startPush(title,FRIEND,true);//开始直播
                 break;
             case QQ:
                 imageQq.setImageResource(R.mipmap.qq_selector);
-                ShareUtils.shareQQ(this, title, "http://blog.csdn.net/liguangzhenghi/article/details/8076361", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", false, setShareListener);
+                startPush(title,QQ,true);//开始直播
                 break;
             case QQZONE:
                 imageQqzone.setImageResource(R.mipmap.zoneqq_selector);
-                ShareUtils.shareQZone(this, title, "http://blog.csdn.net/liguangzhenghi/article/details/8076361", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", "同城秀秀", false, setShareListener);
+                startPush(title,QQZONE,true);//开始直播
                 break;
         }
     }
@@ -264,8 +293,7 @@ public class PushFlowActivity extends Activity {
         @Override
         public void shareSuccess(boolean issuccess, boolean iscallback) {
             if (issuccess) {
-
-                startPush();
+                startPushAPI();
                 if (iscallback) {
                     //在这做分享成功后告诉后端
                     shareLiveId();
@@ -517,7 +545,10 @@ public class PushFlowActivity extends Activity {
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                startActivity(new Intent(PushFlowActivity.this, StopPushActivity.class));
+                if (isRecording){
+                     //如果已经开始直播了就要到结束直播那
+                    startActivity(new Intent(PushFlowActivity.this, StopPushActivity.class));
+                }
                 finish();
             }
         });
@@ -544,7 +575,6 @@ public class PushFlowActivity extends Activity {
         webSettings.setDefaultTextEncodingName("utf-8");
         pushWebview.setBackgroundColor(0); // 设置背景色
         pushWebview.addJavascriptInterface(new javaScriptObjcet(), "jnoo");
-        pushWebview.loadUrl(Sharedparms.WEBPUSH);
         pushWebview.setWebChromeClient(new WebChromeClient());
     }
 
@@ -554,7 +584,8 @@ public class PushFlowActivity extends Activity {
      */
     public class javaScriptObjcet {
         @JavascriptInterface
-        public void wxlogin() {
+        public void livelist11() {
+            //开始直播
         }
     }
 
@@ -974,7 +1005,7 @@ public class PushFlowActivity extends Activity {
         @Override
         public void run() {
             if (mRecordReporter != null) {
-                 UtilTool.ShowToast(PushFlowActivity.this, mRecordReporter.getInt(AlivcRecordReporter.VIDEO_OUTPUT_FPS) + "fps");
+               //  UtilTool.ShowToast(PushFlowActivity.this, mRecordReporter.getInt(AlivcRecordReporter.VIDEO_OUTPUT_FPS) + "fps");
             }
         }
     };

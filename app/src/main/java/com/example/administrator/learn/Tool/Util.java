@@ -3,9 +3,8 @@ package com.example.administrator.learn.Tool;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
-import android.graphics.Matrix;
-import android.graphics.Rect;
+import android.os.Environment;
+import android.os.StatFs;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -31,11 +30,9 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -408,6 +405,38 @@ public class Util {
 		}
 		return ip;
 	}
+	/**
+	 * 判断是否装有SD卡、是否可读写、是否有空间
+	 *
+	 * @param size
+	 *            需存入的文件大小，SD剩余空间必须大于该值
+	 * @return true可用，false不可用
+	 */
+	public static boolean checkSDStatus(long size)
+	{
+		try
+		{
+	    /* 读取SD卡大小 */
+			File storage = Environment.getExternalStorageDirectory();
+			StatFs stat = new StatFs(storage.getPath());
+			long blocks = stat.getAvailableBlocks();
+			long blocksize = stat.getBlockSize();
 
+	    /* 判断 */
+			if (Environment.getExternalStorageState().equals(
+					Environment.MEDIA_MOUNTED)
+					&& (blocks * blocksize) > size)
+			{
+				return true;
+			} else
+			{
+				return false;
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 }

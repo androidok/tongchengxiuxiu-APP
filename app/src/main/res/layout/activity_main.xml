@@ -6,7 +6,7 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               tools:context="com.example.administrator.learn.MainActivity">
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
@@ -26,7 +26,7 @@
             android:layout_toEndOf="@+id/btn_pushflow"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"/>
-    </RelativeLayout>
+    </RelativeLayout>-->
 
 
     <WebView

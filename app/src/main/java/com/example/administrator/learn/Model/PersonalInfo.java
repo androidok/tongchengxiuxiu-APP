@@ -9,7 +9,7 @@ public class PersonalInfo {
     /**
      * status : 1
      * msg : 成功！
-     * data : {"id":"258216","user_login":"15880268607","user_nicename":"想你的天","avatar":"","live_rtmp":"rtmp://video-center.alivecdn.com/shanmao1/258216?vhost=live.jnoo.com","live_url":"http://live.jnoo.com/shanmao1/.m3u8"}
+     * data : {"id":"258216","user_login":"15880268607","user_nicename":"想你的天","avatar":"","live_rtmp":"rtmp://video-center.alivecdn.com/shanmao1/258216?vhost=live.jnoo.com","share_url":"http://jy.jnooo23.top/index.php?s=/Live/Index/show/room_id/258216.html"}
      */
 
     private int status;
@@ -24,6 +24,10 @@ public class PersonalInfo {
         this.status = status;
     }
 
+    public String getMsg() {
+        return msg;
+    }
+
     @Override
     public String toString() {
         return "PersonalInfo{" +
@@ -31,10 +35,6 @@ public class PersonalInfo {
                 ", msg='" + msg + '\'' +
                 ", data=" + data +
                 '}';
-    }
-
-    public String getMsg() {
-        return msg;
     }
 
     public void setMsg(String msg) {
@@ -56,11 +56,15 @@ public class PersonalInfo {
          * user_nicename : 想你的天
          * avatar :
          * live_rtmp : rtmp://video-center.alivecdn.com/shanmao1/258216?vhost=live.jnoo.com
-         * live_url : http://live.jnoo.com/shanmao1/.m3u8
+         * share_url : http://jy.jnooo23.top/index.php?s=/Live/Index/show/room_id/258216.html
          */
 
         private String id;
         private String user_login;
+        private String user_nicename;
+        private String avatar;
+        private String live_rtmp;
+        private String share_url;
 
         @Override
         public String toString() {
@@ -70,14 +74,9 @@ public class PersonalInfo {
                     ", user_nicename='" + user_nicename + '\'' +
                     ", avatar='" + avatar + '\'' +
                     ", live_rtmp='" + live_rtmp + '\'' +
-                    ", live_url='" + live_url + '\'' +
+                    ", share_url='" + share_url + '\'' +
                     '}';
         }
-
-        private String user_nicename;
-        private String avatar;
-        private String live_rtmp;
-        private String live_url;
 
         public String getId() {
             return id;
@@ -119,12 +118,12 @@ public class PersonalInfo {
             this.live_rtmp = live_rtmp;
         }
 
-        public String getLive_url() {
-            return live_url;
+        public String getShare_url() {
+            return share_url;
         }
 
-        public void setLive_url(String live_url) {
-            this.live_url = live_url;
+        public void setShare_url(String share_url) {
+            this.share_url = share_url;
         }
     }
 }

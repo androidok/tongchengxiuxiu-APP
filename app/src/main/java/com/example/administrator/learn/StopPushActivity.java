@@ -70,7 +70,7 @@ public class StopPushActivity extends Activity {
                 tvWatchNum.setText(stoppushInfo.getData().getLive_num());
                 tvShareNum.setText(stoppushInfo.getData().getFx_num());
                 tvNiName.setText(SPUtils.getNiceName(StopPushActivity.this));
-                tvTime.setText("直播时长:"+UtilTool.getTimeDifference(stoppushInfo.getData().getStart_time(),stoppushInfo.getData().getEnd_time()));
+                tvTime.setText("直播时长:"+stoppushInfo.getData().getLive_time());
                 tvGold.setText(stoppushInfo.getData().getLive_money());
                 setimage(stoppushInfo.getData().getLive_img());
                 UtilTool.ShowToast(StopPushActivity.this, stoppushInfo.toString());
@@ -79,6 +79,7 @@ public class StopPushActivity extends Activity {
 
             @Override
             public void _OnError(String errormessage) {
+                setimage(null);
                 UtilTool.ShowToast(StopPushActivity.this, errormessage);
             }
         });
@@ -89,7 +90,7 @@ public class StopPushActivity extends Activity {
      */
     private void setimage(String liveimage) {
         Glide.with(StopPushActivity.this)
-                .load("http://tx.haiqq.com/uploads/allimg/150327/2105502I5-6.jpg")
+                .load(SPUtils.getheader_url(this))
                 .placeholder(R.mipmap.hande_default)
                 .error(R.mipmap.hande_default)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)

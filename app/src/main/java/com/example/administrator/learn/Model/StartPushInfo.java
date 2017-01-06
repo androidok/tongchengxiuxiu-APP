@@ -9,12 +9,16 @@ public class StartPushInfo {
     /**
      * status : 1
      * msg : 成功
-     * data : {"liveId":1}
+     * data : {"liveId":2,"share_url":"http://jy.jnooo23.top/index.php?s=/Live/Index/show/live_id/2.html"}
      */
 
     private int status;
     private String msg;
     private DataBean data;
+
+    public int getStatus() {
+        return status;
+    }
 
     @Override
     public String toString() {
@@ -23,10 +27,6 @@ public class StartPushInfo {
                 ", msg='" + msg + '\'' +
                 ", data=" + data +
                 '}';
-    }
-
-    public int getStatus() {
-        return status;
     }
 
     public void setStatus(int status) {
@@ -50,18 +50,13 @@ public class StartPushInfo {
     }
 
     public static class DataBean {
-        @Override
-        public String toString() {
-            return "DataBean{" +
-                    "liveId=" + liveId +
-                    '}';
-        }
-
         /**
-         * liveId : 1
+         * liveId : 2
+         * share_url : http://jy.jnooo23.top/index.php?s=/Live/Index/show/live_id/2.html
          */
 
         private int liveId;
+        private String share_url;
 
         public int getLiveId() {
             return liveId;
@@ -69,6 +64,22 @@ public class StartPushInfo {
 
         public void setLiveId(int liveId) {
             this.liveId = liveId;
+        }
+
+        @Override
+        public String toString() {
+            return "DataBean{" +
+                    "liveId=" + liveId +
+                    ", share_url='" + share_url + '\'' +
+                    '}';
+        }
+
+        public String getShare_url() {
+            return share_url;
+        }
+
+        public void setShare_url(String share_url) {
+            this.share_url = share_url;
         }
     }
 }
