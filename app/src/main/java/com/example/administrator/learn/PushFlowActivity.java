@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -50,7 +49,6 @@ import com.example.administrator.learn.Model.StartPushInfo;
 import com.example.administrator.learn.Model.apiSuccessInfo;
 import com.example.administrator.learn.ServceTool.ApiService;
 import com.example.administrator.learn.Tool.SPUtils;
-import com.example.administrator.learn.Tool.SelecPopuview;
 import com.example.administrator.learn.Tool.ShareUtils;
 import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.UtilTool;
@@ -102,18 +100,19 @@ public class PushFlowActivity extends Activity {
     private View layout_startpush;//是添加标题那个view
     private ProgressDialog progressDialog;
     private AlertDialog.Builder builder;
+    private String title;//标题
 
     @OnClick({R.id.btn_startpush, R.id.image_cameraresvise, R.id.image_xx, R.id.layout_weibo, R.id.layout_wexin, R.id.layout_friend
             , R.id.layout_qq, R.id.layout_qqzone})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_startpush://开始直播
-                String title = edTitle.getText().toString().trim();
+                title = edTitle.getText().toString().trim();
                 if (TextUtils.isEmpty(title)) {
                     UtilTool.ShowToast(PushFlowActivity.this, "标题不能为空");
                     return;
                 }
-                startPush(title,-2,false);
+                startPush(title, -2, false);
                 break;
             case R.id.image_cameraresvise://设置摄像头
                 int currFacing = mMediaRecorder.switchCamera();
@@ -143,41 +142,49 @@ public class PushFlowActivity extends Activity {
         }
     }
 
+//    /**
+//     * 显示popuview对话框
+//     */
+//    private void showPopuViewDialog() {
+//        SelecPopuview picPopupWindow = new SelecPopuview(this, new SelecPopuview.setonListener() {
+//            @Override
+//            public void setonlistfener(View view, int index) {
+//                String imageUrl = SPUtils.getimage_url(PushFlowActivity.this);
+//                String shareUrl = SPUtils.getshare_url(PushFlowActivity.this);
+//                if (TextUtils.isEmpty(shareUrl)) {
+//                    UtilTool.ShowToast(PushFlowActivity.this, "分享失败");
+//                    return;
+//                }
+//                switch (index) {
+//                    case SelecPopuview.WEIBO:
+//                        ShareUtils.shareSinaWei(PushFlowActivity.this, title, imageUrl, true, setShareListener);
+//                        break;
+//                    case SelecPopuview.WEIXIN:
+//                        ShareUtils.shareweixin(PushFlowActivity.this, title, title, imageUrl, shareUrl, true, setShareListener);
+//                        break;
+//                    case SelecPopuview.FRIEND:
+//                        ShareUtils.shareWechatMoments(PushFlowActivity.this, title, title, imageUrl, shareUrl, true, setShareListener);
+//                        break;
+//                    case SelecPopuview.QQ:
+//                        ShareUtils.shareQQ(PushFlowActivity.this, title, shareUrl, imageUrl, true, setShareListener);
+//                        break;
+//                    case SelecPopuview.QQZONE:
+//                        ShareUtils.shareQZone(PushFlowActivity.this, title, shareUrl, imageUrl, "同城秀秀", true, setShareListener);
+//                        break;
+//                }
+//            }
+//        });
+//        //设置layout在PopupWindow中显示的位置
+//        picPopupWindow.showAtLocation(PushFlowActivity.this.findViewById(R.id.btn_startpush), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+//
+//    }
+
     /**
-     * 显示popuview对话框
-     */
-    private void showPopuViewDialog() {
-        SelecPopuview picPopupWindow = new SelecPopuview(this, new SelecPopuview.setonListener() {
-            @Override
-            public void setonlistfener(View view, int index) {
-                switch (index) {
-                    case SelecPopuview.WEIBO:
-                        ShareUtils.shareSinaWei(PushFlowActivity.this, "", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", true, setShareListener);
-                        break;
-                    case SelecPopuview.WEIXIN:
-                        ShareUtils.shareweixin(PushFlowActivity.this, "title", "title", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", "http://blog.csdn.net/liguangzhenghi/article/details/8076361", true, setShareListener);
-                        break;
-                    case SelecPopuview.FRIEND:
-                        ShareUtils.shareWechatMoments(PushFlowActivity.this, "title", "title", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", "http://blog.csdn.net/liguangzhenghi/article/details/8076361", true, setShareListener);
-                        break;
-                    case SelecPopuview.QQ:
-                        ShareUtils.shareQQ(PushFlowActivity.this, "title", "http://blog.csdn.net/liguangzhenghi/article/details/8076361", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", true, setShareListener);
-                        break;
-                    case SelecPopuview.QQZONE:
-                        ShareUtils.shareQZone(PushFlowActivity.this, "title", "http://blog.csdn.net/liguangzhenghi/article/details/8076361", "http://img1.imgtn.bdimg.com/it/u=1222734533,741800870&fm=21&gp=0.jpg", "同城秀秀", true, setShareListener);
-                        break;
-                }
-            }
-        });
-        //设置layout在PopupWindow中显示的位置
-        picPopupWindow.showAtLocation(PushFlowActivity.this.findViewById(R.id.btn_startpush), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
-
-    }
-
-    /**开始直播接口
+     * 开始直播接口
+     *
      * @param title
      * @param index
-     * @param isShare  是否先要分享再直播
+     * @param isShare 是否先要分享再直播
      */
     private void startPush(final String title, final int index, final boolean isShare) {
         progressDialog = ProgressDialog.show(this, null, "处理中");
@@ -188,13 +195,13 @@ public class PushFlowActivity extends Activity {
                 progressDialog.dismiss();
                 if (StartPushInfo.getStatus() == Sharedparms.statusSuccess) {
                     SPUtils.Putliveid(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
-                    SPUtils.Putshare_url(PushFlowActivity.this,StartPushInfo.getData().getShare_url());
-                    UtilTool.ShowToast(PushFlowActivity.this,StartPushInfo.getData().getLiveId()+"");
-                    pushWebview.loadUrl(Sharedparms.WEBPUSH+StartPushInfo.getData().getLiveId());
-                    if (isShare){
+                    SPUtils.Putshare_url(PushFlowActivity.this, StartPushInfo.getData().getShare_url());
+//                    UtilTool.ShowToast(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
+                    pushWebview.loadUrl(Sharedparms.WEBPUSH + StartPushInfo.getData().getLiveId());
+                    if (isShare) {
                         //分享
-                        share(index,title,StartPushInfo.getData().getShare_url());
-                    }else {
+                        share(index, title, StartPushInfo.getData().getShare_url());
+                    } else {
                         startPushAPI();
                     }
                 } else {
@@ -215,24 +222,26 @@ public class PushFlowActivity extends Activity {
     /**
      * 功能上 -开始直播
      */
-    private void startPushAPI(){
+    private void startPushAPI() {
         //开始推流
-                    layout_startpush.setVisibility(View.GONE);
-                    layoutWebview.setVisibility(View.VISIBLE);
-                    mMediaRecorder.startRecord(pushUrl);
-                    isRecording = true;
+        layout_startpush.setVisibility(View.GONE);
+        layoutWebview.setVisibility(View.VISIBLE);
+        mMediaRecorder.startRecord(pushUrl);
+        isRecording = true;
     }
 
-    /**分享
+    /**
+     * 分享
+     *
      * @param index
      */
-    private void share(int index,String title,String share_url) {
-        switch (index){
+    private void share(int index, String title, String share_url) {
+        switch (index) {
             case WEIBO:
                 ShareUtils.shareSinaWei(PushFlowActivity.this, title, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
                 break;
             case WEIXIN:
-                ShareUtils.shareweixin(PushFlowActivity.this, title, title, SPUtils.getimage_url(PushFlowActivity.this),share_url , false, setShareListener);
+                ShareUtils.shareweixin(PushFlowActivity.this, title, title, SPUtils.getimage_url(PushFlowActivity.this), share_url, false, setShareListener);
                 break;
             case FRIEND:
                 ShareUtils.shareWechatMoments(PushFlowActivity.this, title, title, SPUtils.getimage_url(PushFlowActivity.this), share_url, false, setShareListener);
@@ -241,7 +250,7 @@ public class PushFlowActivity extends Activity {
                 ShareUtils.shareQQ(PushFlowActivity.this, title, share_url, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
                 break;
             case QQZONE:
-                ShareUtils.shareQZone(PushFlowActivity.this, title,share_url, SPUtils.getimage_url(PushFlowActivity.this), "同城秀秀", false, setShareListener);
+                ShareUtils.shareQZone(PushFlowActivity.this, title, share_url, SPUtils.getimage_url(PushFlowActivity.this), "同城秀秀", false, setShareListener);
                 break;
         }
     }
@@ -267,23 +276,23 @@ public class PushFlowActivity extends Activity {
         switch (index) {
             case WEIBO:
                 imageWeibo.setImageResource(R.mipmap.weibo_selector);
-                startPush(title,WEIBO,true);//开始直播
+                startPush(title, WEIBO, true);//开始直播
                 break;
             case WEIXIN:
                 imageWeixin.setImageResource(R.mipmap.wexin_selector);
-                startPush(title,WEIXIN,true);//开始直播
+                startPush(title, WEIXIN, true);//开始直播
                 break;
             case FRIEND:
                 imageFriend.setImageResource(R.mipmap.friend_selector);
-                startPush(title,FRIEND,true);//开始直播
+                startPush(title, FRIEND, true);//开始直播
                 break;
             case QQ:
                 imageQq.setImageResource(R.mipmap.qq_selector);
-                startPush(title,QQ,true);//开始直播
+                startPush(title, QQ, true);//开始直播
                 break;
             case QQZONE:
                 imageQqzone.setImageResource(R.mipmap.zoneqq_selector);
-                startPush(title,QQZONE,true);//开始直播
+                startPush(title, QQZONE, true);//开始直播
                 break;
         }
     }
@@ -291,13 +300,18 @@ public class PushFlowActivity extends Activity {
     ShareUtils.setShareListener setShareListener = new ShareUtils.setShareListener() {
 
         @Override
-        public void shareSuccess(boolean issuccess, boolean iscallback) {
-            if (issuccess) {
-                startPushAPI();
-                if (iscallback) {
+        public void shareSuccess(boolean isSuccess, boolean iscallback) {
+            if (iscallback) {
+                if (isSuccess) {
                     //在这做分享成功后告诉后端
                     shareLiveId();
-
+                }
+            } else {
+                //预览页面分享后直接推流
+                startPushAPI();
+                if (isSuccess) {
+                    //分享成功也是告诉后端
+                    shareLiveId();
                 }
             }
 
@@ -314,7 +328,7 @@ public class PushFlowActivity extends Activity {
                 if (apiSuccessInfo.getStatus() == Sharedparms.statusSuccess) {
                     UtilTool.ShowToast(PushFlowActivity.this, "接口成功");
                 } else {
-                    UtilTool.ShowToast(PushFlowActivity.this, "" + apiSuccessInfo.getMsg());
+                    UtilTool.ShowToast(PushFlowActivity.this, apiSuccessInfo.getMsg() + apiSuccessInfo.getMsg());
                 }
 
             }
@@ -545,8 +559,8 @@ public class PushFlowActivity extends Activity {
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (isRecording){
-                     //如果已经开始直播了就要到结束直播那
+                if (isRecording) {
+                    //如果已经开始直播了就要到结束直播那
                     startActivity(new Intent(PushFlowActivity.this, StopPushActivity.class));
                 }
                 finish();
@@ -584,8 +598,27 @@ public class PushFlowActivity extends Activity {
      */
     public class javaScriptObjcet {
         @JavascriptInterface
-        public void livelist11() {
-            //开始直播
+        public void livestop() {
+            builder.show();
+        }
+
+        @JavascriptInterface
+        public void liveShare() {
+            //分享
+//            showPopuViewDialog();
+            String image_url = SPUtils.getimage_url(PushFlowActivity.this);
+            String share_url = SPUtils.getshare_url(PushFlowActivity.this);
+            ShareUtils.showPopuViewDialog(PushFlowActivity.this,title,image_url,share_url,PushFlowActivity.this.findViewById(R.id.btn_startpush),setShareListener);
+        }
+
+        @JavascriptInterface
+        public void switchCamera() {
+            //切换摄像头
+            int currFacing = mMediaRecorder.switchCamera();
+            if (currFacing == AlivcMediaFormat.CAMERA_FACING_FRONT) {
+                mMediaRecorder.addFlag(AlivcMediaFormat.FLAG_BEAUTY_ON);
+            }
+            mConfigure.put(AlivcMediaFormat.KEY_CAMERA_FACING, currFacing);
         }
     }
 
@@ -876,12 +909,20 @@ public class PushFlowActivity extends Activity {
         @Override
         public void onNetworkBusy() {
             Log.d("network_status", "==== on network busy ====");
-            Toast.makeText(PushFlowActivity.this, "当前网络状态极差，已无法正常流畅直播，确认要继续直播吗？", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "当前网络状态极差，已无法正常流畅直播，确认要继续直播吗？", Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder builder = UtilTool.creatDialog(PushFlowActivity.this, "错误提示", "当前网络状态极差，已无法正常流畅直播，确认要继续直播吗？", "关闭", new UtilTool.SetonListener<DialogInterface>() {
+                @Override
+                public void setonlistener(DialogInterface dialogInterface, int i) {
+                    PushFlowActivity.this.finish();
+                }
+            });
+            builder.setCancelable(true);
+            builder.show();
         }
 
         @Override
         public void onNetworkFree() {
-            Toast.makeText(PushFlowActivity.this, "network free", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "network free", Toast.LENGTH_SHORT).show();
             Log.d("network_status", "===== on network free ====");
         }
 
@@ -891,13 +932,13 @@ public class PushFlowActivity extends Activity {
 
             switch (status) {
                 case AlivcStatusCode.STATUS_CONNECTION_START:
-                    Toast.makeText(PushFlowActivity.this, "Start live stream connection!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(PushFlowActivity.this, "Start live stream connection!", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Start live stream connection!");
                     break;
                 case AlivcStatusCode.STATUS_CONNECTION_ESTABLISHED:
                     Log.d(TAG, "Live stream connection is established!");
 //                    showIllegalArgumentDialog("链接成功");
-                    Toast.makeText(PushFlowActivity.this, "Live stream connection is established!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(PushFlowActivity.this, "Live stream connection is established!", Toast.LENGTH_SHORT).show();
                     break;
                 case AlivcStatusCode.STATUS_CONNECTION_CLOSED:
                     Log.d(TAG, "Live stream connection is closed!");
@@ -905,7 +946,7 @@ public class PushFlowActivity extends Activity {
 //                    mLiveRecorder.stop();
 //                    mLiveRecorder.release();
 //                    mLiveRecorder = null;
-//                    mMediaRecorder.stopRecord();
+                    mMediaRecorder.stopRecord();
                     break;
             }
         }
@@ -919,7 +960,7 @@ public class PushFlowActivity extends Activity {
         @Override
         public boolean onNetworkReconnectFailed() {
             Log.d(TAG, "Reconnect timeout, not adapt to living");
-            Toast.makeText(PushFlowActivity.this, "长时间重连失败，已不适合直播，请退出", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "长时间重连失败，已不适合直播，请退出", Toast.LENGTH_SHORT).show();
             mMediaRecorder.stopRecord();
             showIllegalArgumentDialog("网络重连失败");
             return false;
@@ -978,17 +1019,30 @@ public class PushFlowActivity extends Activity {
             Log.d(TAG, "Live stream connection error-->" + errorCode);
 
             switch (errorCode) {
-                case AlivcStatusCode.ERROR_ILLEGAL_ARGUMENT:
+                case AlivcStatusCode.ERROR_ILLEGAL_ARGUMENT://非法参数
+                    UtilTool.ShowToast(PushFlowActivity.this,"非法参数");
                     showIllegalArgumentDialog("-22错误产生");
-                case AlivcStatusCode.ERROR_SERVER_CLOSED_CONNECTION:
-                case AlivcStatusCode.ERORR_OUT_OF_MEMORY:
-                case AlivcStatusCode.ERROR_CONNECTION_TIMEOUT:
-                case AlivcStatusCode.ERROR_BROKEN_PIPE:
-                case AlivcStatusCode.ERROR_IO:
-                case AlivcStatusCode.ERROR_NETWORK_UNREACHABLE:
-                    Toast.makeText(PushFlowActivity.this, "Live stream connection error-->" + errorCode, Toast.LENGTH_SHORT).show();
-
                     break;
+                case AlivcStatusCode.ERROR_SERVER_CLOSED_CONNECTION://-104
+                    finish();
+                    break;
+                case AlivcStatusCode.ERORR_OUT_OF_MEMORY://内存不足
+                    UtilTool.ShowToast(PushFlowActivity.this,"内存不足");
+                    break;
+                case AlivcStatusCode.ERROR_CONNECTION_TIMEOUT:
+                case AlivcStatusCode.ERROR_BROKEN_PIPE://管道中断
+
+                    UtilTool.ShowToast(PushFlowActivity.this,"管道中断");
+                    break;
+                case AlivcStatusCode.ERROR_IO://IO
+
+                    UtilTool.ShowToast(PushFlowActivity.this,"IO");
+                    break;
+                case AlivcStatusCode.ERROR_NETWORK_UNREACHABLE://网络不可达
+                    UtilTool.ShowToast(PushFlowActivity.this,"网络不可达");
+                        break;
+
+
 
                 default:
             }
@@ -1005,7 +1059,7 @@ public class PushFlowActivity extends Activity {
         @Override
         public void run() {
             if (mRecordReporter != null) {
-               //  UtilTool.ShowToast(PushFlowActivity.this, mRecordReporter.getInt(AlivcRecordReporter.VIDEO_OUTPUT_FPS) + "fps");
+                //  UtilTool.ShowToast(PushFlowActivity.this, mRecordReporter.getInt(AlivcRecordReporter.VIDEO_OUTPUT_FPS) + "fps");
             }
         }
     };
@@ -1018,8 +1072,8 @@ public class PushFlowActivity extends Activity {
             int currBitrate = bundle.getInt(AlivcEvent.EventBundleKey.KEY_CURR_BITRATE);
             Log.d(TAG, "event->up bitrate, previous bitrate is " + preBitrate +
                     "current bitrate is " + currBitrate);
-            Toast.makeText(PushFlowActivity.this, "event->up bitrate, previous bitrate is " + preBitrate +
-                    "current bitrate is " + currBitrate, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "event->up bitrate, previous bitrate is " + preBitrate +
+//                    "current bitrate is " + currBitrate, Toast.LENGTH_SHORT).show();
         }
     };
     private AlivcEventResponse mBitrateDownRes = new AlivcEventResponse() {
@@ -1030,37 +1084,37 @@ public class PushFlowActivity extends Activity {
             int currBitrate = bundle.getInt(AlivcEvent.EventBundleKey.KEY_CURR_BITRATE);
             Log.d(TAG, "event->down bitrate, previous bitrate is " + preBitrate +
                     "current bitrate is " + currBitrate);
-            Toast.makeText(PushFlowActivity.this, "event->down bitrate, previous bitrate is " + preBitrate +
-                    "current bitrate is " + currBitrate, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "event->down bitrate, previous bitrate is " + preBitrate +
+//                    "current bitrate is " + currBitrate, Toast.LENGTH_SHORT).show();
         }
     };
     private AlivcEventResponse mAudioCaptureSuccRes = new AlivcEventResponse() {
         @Override
         public void onEvent(AlivcEvent event) {
-            Log.d(TAG, "event->audio recorder start success");
-            Toast.makeText(PushFlowActivity.this, "event->audio recorder start success", Toast.LENGTH_SHORT).show();
+//            Log.d(TAG, "event->audio recorder start success");
+//            Toast.makeText(PushFlowActivity.this, "event->audio recorder start success", Toast.LENGTH_SHORT).show();
         }
     };
 
     private AlivcEventResponse mVideoEncoderSuccRes = new AlivcEventResponse() {
         @Override
         public void onEvent(AlivcEvent event) {
-            Log.d(TAG, "event->video encoder start success");
-            Toast.makeText(PushFlowActivity.this, "event->video encoder start success", Toast.LENGTH_SHORT).show();
+//            Log.d(TAG, "event->video encoder start success");
+//            Toast.makeText(PushFlowActivity.this, "event->video encoder start success", Toast.LENGTH_SHORT).show();
         }
     };
     private AlivcEventResponse mVideoEncoderFailedRes = new AlivcEventResponse() {
         @Override
         public void onEvent(AlivcEvent event) {
-            Log.d(TAG, "event->video encoder start failed");
-            Toast.makeText(PushFlowActivity.this, "event->video encoder start failed", Toast.LENGTH_SHORT).show();
+//            Log.d(TAG, "event->video encoder start failed");
+//            Toast.makeText(PushFlowActivity.this, "event->video encoder start failed", Toast.LENGTH_SHORT).show();
         }
     };
     private AlivcEventResponse mVideoEncodeFrameFailedRes = new AlivcEventResponse() {
         @Override
         public void onEvent(AlivcEvent event) {
-            Log.d(TAG, "event->video encode frame failed");
-            Toast.makeText(PushFlowActivity.this, "event->video encode frame failed", Toast.LENGTH_SHORT).show();
+//            Log.d(TAG, "event->video encode frame failed");
+//            Toast.makeText(PushFlowActivity.this, "event->video encode frame failed", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -1069,7 +1123,7 @@ public class PushFlowActivity extends Activity {
         @Override
         public void onEvent(AlivcEvent event) {
             Log.d(TAG, "event->live recorder initialize completely");
-            Toast.makeText(PushFlowActivity.this, "event->live recorder initialize completely", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "event->live recorder initialize completely", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -1082,7 +1136,7 @@ public class PushFlowActivity extends Activity {
                 discardFrames = bundle.getInt(AlivcEvent.EventBundleKey.KEY_DISCARD_FRAMES);
             }
             Log.d(TAG, "event->data discard, the frames num is " + discardFrames);
-            Toast.makeText(PushFlowActivity.this, "event->data discard, the frames num is ", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "event->data discard, the frames num is ", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -1090,7 +1144,7 @@ public class PushFlowActivity extends Activity {
         @Override
         public void onEvent(AlivcEvent event) {
             Log.d(TAG, "event-> audio capture device open failed");
-            Toast.makeText(PushFlowActivity.this, "event-> audio capture device open failed", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "event-> audio capture device open failed", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -1098,7 +1152,7 @@ public class PushFlowActivity extends Activity {
         @Override
         public void onEvent(AlivcEvent event) {
             Log.d(TAG, "event-> audio encode frame failed");
-            Toast.makeText(PushFlowActivity.this, "event-> audio encode frame failed", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(PushFlowActivity.this, "event-> audio encode frame failed", Toast.LENGTH_SHORT).show();
         }
     };
 }

@@ -2,6 +2,7 @@ package com.example.administrator.learn;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -85,7 +86,6 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
                 return true;
             }
         });
-
         WebSettings webSettings = mwebview.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowContentAccess(true);
@@ -241,17 +241,18 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
         }
 
     }
+
     /**
      * 上传照片
      */
     private void putPicture(String path) {
-       final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, "", "开始直播，稍等...");
+        final ProgressDialog progressDialog = ProgressDialog.show(MainActivity.this, "", "开始直播，稍等...");
         ApiService.putPicture(path, new ApiService.ParsedRequestListener<putPictureInfo>() {
             @Override
             public void onResponseResult(putPictureInfo response) {
                 progressDialog.dismiss();
                 if (response.getStatus() == Sharedparms.statusSuccess) {
-                    SPUtils.Putimage_url(MainActivity.this,response.getData().getUrl());
+                    SPUtils.Putimage_url(MainActivity.this, response.getData().getUrl());
                     pushFlow();
                 } else {
                     UtilTool.ShowToast(MainActivity.this, response.getMsg());
@@ -260,33 +261,35 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
 
             @Override
             public void _OnError(String errormessage) {
-                UtilTool.ShowToast(MainActivity.this,errormessage);
+                UtilTool.ShowToast(MainActivity.this, errormessage);
                 progressDialog.dismiss();
             }
         });
 
 
     }
+
     private void pushFlow() {
         String livertmpUrl = SPUtils.getlivertmpUrl(MainActivity.this);
          /*开始推流*/
         PushFlowActivity.RequestBuilder builder = new PushFlowActivity.RequestBuilder()
-                .bestBitrate(600)
+                .bestBitrate(1000)//600
                 .cameraFacing(1)//是否前置摄像头  1前面  0后面
                 .dx(14)//marginx
                 .dy(14)
                 .site(1)//水印位置
                 .rtmpUrl(livertmpUrl)//rtmp服务器地址
-                .videoResolution(360)
+                .videoResolution(540)//360
                 .portrait(false)//是否横屏
                 //.watermarkUrl("assets:///spalsh.png")// 水印图片路径
                 //.watermarkUrl("assets://qupai-logo.png")
-                .minBitrate(500)//帧率
-                .maxBitrate(800)
-                .frameRate(600)
-                .initBitrate(800);
+                .minBitrate(400)//500帧率
+                .maxBitrate(1200)//600
+                .frameRate(1000)//600
+                .initBitrate(1000);//800
         PushFlowActivity.startActivity(this, builder);
     }
+
     /**
      * 获取个人信息
      */
@@ -304,9 +307,12 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
                     SPUtils.PutNiceName(MainActivity.this, response.getData().getUser_nicename());
                     SPUtils.PutUserAccount(MainActivity.this, response.getData().getUser_login());
                     SPUtils.Putheader_url(MainActivity.this, response.getData().getAvatar());
+                    Log.e("推流地址", "" + response.getData().getLive_rtmp());
                     //去拍照
                     imagePicker.startImagePickFromCamera();
                 } else {
+                    //status -4;//您已经在直播了
+                    //status -3;//您已经被禁播
                     UtilTool.ShowToast(MainActivity.this, response.getMsg());
                 }
             }
@@ -317,6 +323,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
             }
         });
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         imagePicker.onActivityResult(requestCode, resultCode, data);
@@ -325,7 +332,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
 
     @Override
     public void onImagePicked(Bitmap bitmap, int requestCode, Intent data, Uri originalUri, String path) {
-        UtilTool.ShowToast(this, path);
+//        UtilTool.ShowToast(this, path);
         putPicture(path);
     }
 
@@ -357,7 +364,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
             //传id过来，设置别名
             JPushInterface.setAlias(MainActivity.this, uid, null);
             SPUtils.PutUid(MainActivity.this, uid);
-            UtilTool.ShowToast(MainActivity.this, uid);
+//            UtilTool.ShowToast(MainActivity.this, uid);
         }
 
         /*
@@ -370,7 +377,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
                 Toast.makeText(MainActivity.this, "服务器异常", Toast.LENGTH_SHORT).show();
                 return;
             }
-            //开始预支付
+            //开始预支付/
             try {
                 final JSONObject jsonObject = new JSONObject(wxPayInfo);
                 final String tradeNo = jsonObject.getString("tradeNo");
@@ -560,12 +567,41 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
         }
 
         /**
-         * 开始直播
+         * 我要直播
          */
         @JavascriptInterface
         public void livelist() {
-//            startActivity(new Intent(MainActivity.this,CameraActivity.class));
-            getPersonalinfo();
+            UtilTool.creatDialog(MainActivity.this, "提示！", "               先拍摄直播封面图", "确定", new UtilTool.SetonListener<DialogInterface>() {
+                @Override
+                public void setonlistener(DialogInterface dialogInterface, int i) {
+                    getPersonalinfo();
+                }
+            }).show();
+
+
+        }
+
+        @JavascriptInterface
+        public void VideoPlay(String data) {
+//            UtilTool.ShowToast(MainActivity.this, data.toString());
+            if (TextUtils.isEmpty(data)) {
+                UtilTool.ShowToast(MainActivity.this, "出现问题");
+                return;
+            }
+            try {
+                JSONObject jsonObject = new JSONObject(data);
+                String live_url = jsonObject.getString("live_url");
+                String img = jsonObject.getString("img");
+                String url = jsonObject.getString("url");
+                Log.d("直播播放信息", "" + live_url + ".." + url + ".." + img);
+                Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+                intent.putExtra(Sharedparms.IntentInfo.LIVERTMPURL, live_url);
+                intent.putExtra(Sharedparms.IntentInfo.IMAGEURL, img);
+                intent.putExtra(Sharedparms.IntentInfo.WEBVIEWURL, url);
+                startActivity(intent);
+            } catch (JSONException e) {
+
+            }
 
         }
 
@@ -577,7 +613,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
                     String result = (String) msg.obj;
                     String substring = result.split(";")[0].split("=")[1];
                     String resultStatus = substring.substring(1, substring.length() - 1);
-                    if ("9000" .equalsIgnoreCase(resultStatus)) {
+                    if ("9000".equalsIgnoreCase(resultStatus)) {
                         mwebview.loadUrl("javascript:success(" + resultStatus + ")");
                     } else {
                         mwebview.loadUrl("javascript:error(" + resultStatus + ")");
@@ -593,6 +629,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
 
             }
         };
+
 
         /**
          * @param subject      描述

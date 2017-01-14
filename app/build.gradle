@@ -57,4 +57,5 @@ dependencies {
     compile 'com.amitshekhar.android:android-networking:0.2.0'
     compile 'com.amitshekhar.android:rx-android-networking:0.1.0'
     compile 'org.apache.httpcomponents:httpcore:4.4.1'
+    compile files('libs/alivc-player-2.2.0.13.jar')
 }

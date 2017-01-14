@@ -56,6 +56,16 @@
     <uses-feature android:name="android.hardware.camera.autofocus"/>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!--阿里云直播播放-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application
         android:name=".Tool.MyApp"
@@ -66,6 +76,7 @@
         android:theme="@android:style/Theme.Holo.Light.NoActionBar">
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar">
         </activity>
         <activity
@@ -117,6 +128,7 @@
         </activity>
         <activity
             android:name=".ShlashActivity"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -223,13 +235,34 @@
         <meta-data
             android:name="JPUSH_APPKEY"
             android:value="af5316a7b7e84c865b0bfbab"/> <!-- </>值来自开发者平台取得的AppKey -->
-        <activity android:name=".PushFlowActivity">
+        <activity android:name=".PushFlowActivity"
+                  android:screenOrientation="portrait"
+            >
         </activity>
-        <activity android:name=".CameraActivity">
+        <activity android:name=".CameraActivity"
+                  android:screenOrientation="portrait"
+            >
         </activity>
-        <activity android:name=".PictureActivity">
+        <activity android:name=".PictureActivity"
+                  android:screenOrientation="portrait"
+            >
         </activity>
-        <activity android:name=".StopPushActivity">
+        <activity android:name=".StopPushActivity"
+                  android:screenOrientation="portrait"
+            >
+        </activity>
+        <activity
+            android:name=".PlayerActivity"
+            android:configChanges="screenSize|keyboardHidden|orientation"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
+
+
+            <!--<intent-filter>-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
     </application>
 

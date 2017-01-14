@@ -2,6 +2,9 @@ package com.example.administrator.learn.Tool;
 
 import android.app.Application;
 
+import com.alivc.player.AccessKey;
+import com.alivc.player.AccessKeyCallback;
+import com.alivc.player.AliVcMediaPlayer;
 import com.androidnetworking.AndroidNetworking;
 import com.duanqu.qupai.jni.ApplicationGlue;
 
@@ -29,5 +32,14 @@ public class MyApp extends Application {
         ApplicationGlue.initialize(this);
         /*网络框架*/
         AndroidNetworking.initialize(this);
+        /*
+        * 阿里云直播播放初始化
+        * */
+        final String businessId = "tongchengxiuxiu_live";
+        AliVcMediaPlayer.init(getApplicationContext(), businessId, new AccessKeyCallback() {
+            public AccessKey getAccessToken() {
+                return new AccessKey(Sharedparms.alyInfo.accessKeyId, Sharedparms.alyInfo.accessKeySecret);
+            }
+        });
     }
 }

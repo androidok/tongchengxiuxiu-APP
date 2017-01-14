@@ -1,7 +1,9 @@
 package com.example.administrator.learn.Tool;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -314,5 +316,34 @@ public class UtilTool {
 
         return timeString;
 
+    }
+    /**
+     * 对话框提示
+     */
+    public static AlertDialog.Builder creatDialog(final Activity activity, String Title, String message, String btnstr, final SetonListener<DialogInterface> setonListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setCancelable(false);
+        builder.setTitle(Title);
+        builder.setMessage(message);
+        builder.setPositiveButton(btnstr, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if (setonListener !=null){
+                    setonListener.setonlistener(dialog,which);
+                }
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        return builder;
+
+    }
+    public interface  SetonListener<T>{
+        void setonlistener(T t,int i);
     }
 }

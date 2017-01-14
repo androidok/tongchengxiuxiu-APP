@@ -6,6 +6,8 @@ package com.example.administrator.learn.Tool;
 
 public class Sharedparms {
     public static int statusSuccess = 1;//接口回调成功
+    public static int statusRepeat = -4;//您已经在直播了
+    public static int statusBanned = -3;//您已经被禁播
 
     /*
     网页
@@ -64,9 +66,9 @@ public class Sharedparms {
         public static final String STOPPUSH = "/index.php?s=/Live/Api/overLive/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf";
     }
 
-    /*
-    * sp保存信息
-    * */
+    /**
+     * sp保存信息
+     */
     public static class spinfo {
         public static final String APPINFO = "appinfo";
         public static final String UID = "uid";
@@ -78,6 +80,27 @@ public class Sharedparms {
         public static final String IMAGE_URL = "image_url";//接口返回 封面照片地址
         public static final String LIVEID = "liveid";
 
+    }
+
+    /**
+     * 阿里云直播信息
+     */
+    public static class alyInfo{
+        //直播播放信息
+        public static final String   accessKeyId="LTAIApiow5n3jvqq";
+        public static final String accessKeySecret="vNASpS4FkdYR5cq8vItLYQdppzSQ2J";
+    }
+
+    /**
+     * 常用
+     */
+    public static class IntentInfo{
+        //播放地址
+        public static final String LIVERTMPURL="livertmpUrl";
+        //封面地址
+        public static final String IMAGEURL="imageUrl";
+        //网页地址
+        public static final String WEBVIEWURL="webviewUrl";
 
     }
 

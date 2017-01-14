@@ -73,7 +73,7 @@ public class StopPushActivity extends Activity {
                 tvTime.setText("直播时长:"+stoppushInfo.getData().getLive_time());
                 tvGold.setText(stoppushInfo.getData().getLive_money());
                 setimage(stoppushInfo.getData().getLive_img());
-                UtilTool.ShowToast(StopPushActivity.this, stoppushInfo.toString());
+//                UtilTool.ShowToast(StopPushActivity.this, stoppushInfo.toString());
             }
 
 

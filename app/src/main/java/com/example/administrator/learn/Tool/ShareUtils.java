@@ -1,6 +1,9 @@
 package com.example.administrator.learn.Tool;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -21,10 +24,10 @@ import cn.sharesdk.wechat.moments.WechatMoments;
 public class ShareUtils {
     public interface setShareListener {
         /**
-         * @param issuccess  分享是否成功
+         * @param  isSuccessful 是否成功
          * @param iscallback 是否需要告诉后台
          */
-        void shareSuccess(boolean issuccess, boolean iscallback);
+        void shareSuccess(boolean isSuccessful ,boolean iscallback);
     }
 //
 //    /**
@@ -89,7 +92,7 @@ public class ShareUtils {
             public void onError(Platform platform, int i, Throwable throwable) {
                 UtilTool.ShowToast(context, "分享失败");
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess(false, iscallback);
                 }
             }
 
@@ -97,7 +100,7 @@ public class ShareUtils {
             public void onCancel(Platform platform, int i) {
                 UtilTool.ShowToast(context, "分享取消");
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess(false, iscallback);
                 }
             }
         }); // 设置分享事件回调
@@ -139,7 +142,7 @@ public class ShareUtils {
             public void onError(Platform platform, int i, Throwable throwable) {
                 UtilTool.ShowToast(context, "分享失败");
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess( false,iscallback);
                 }
             }
 
@@ -147,7 +150,7 @@ public class ShareUtils {
             public void onCancel(Platform platform, int i) {
                 UtilTool.ShowToast(context, "分享取消");
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess(false, iscallback);
                 }
             }
         }); // 设置分享事件回调
@@ -181,7 +184,7 @@ public class ShareUtils {
             public void onError(Platform platform, int i, Throwable throwable) {
                 Toast.makeText(context, "分享失败", Toast.LENGTH_SHORT).show();
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess( false,iscallback);
                 }
             }
 
@@ -189,7 +192,7 @@ public class ShareUtils {
             public void onCancel(Platform platform, int i) {
                 Toast.makeText(context, "分享取消", Toast.LENGTH_SHORT).show();
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess( false,iscallback);
                 }
             }
         }); // 设置分享事件回调
@@ -223,7 +226,7 @@ public class ShareUtils {
             public void onError(Platform platform, int i, Throwable throwable) {
                 Toast.makeText(context, "分享失败", Toast.LENGTH_SHORT).show();
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess(false, iscallback);
                 }
             }
 
@@ -231,7 +234,7 @@ public class ShareUtils {
             public void onCancel(Platform platform, int i) {
                 Toast.makeText(context, "分享取消", Toast.LENGTH_SHORT).show();
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess(false, iscallback);
                 }
             }
         }); // 设置分享事件回调
@@ -266,7 +269,7 @@ public class ShareUtils {
             public void onError(Platform platform, int i, Throwable throwable) {
                 Toast.makeText(context, "分享失败", Toast.LENGTH_SHORT).show();
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess(false, iscallback);
                 }
             }
 
@@ -274,11 +277,52 @@ public class ShareUtils {
             public void onCancel(Platform platform, int i) {
                 Toast.makeText(context, "分享取消", Toast.LENGTH_SHORT).show();
                 if (setShareListener != null) {
-                    setShareListener.shareSuccess(true, iscallback);
+                    setShareListener.shareSuccess(false, iscallback);
                 }
             }
         }); // 设置分享事件回调
 // 执行图文分享
         weibo.share(sp);
+    }
+    /**
+     * 显示popuview对话框
+     * @param context
+     * @param title
+     * @param imageUrl
+     * @param shareUrl
+     * @param view
+     * @param setShareListener
+     */
+    public static  void showPopuViewDialog(final  Context context,final  String title,final  String imageUrl,final String shareUrl,final View view, final  setShareListener setShareListener) {
+
+        SelecPopuview picPopupWindow = new SelecPopuview(context, new SelecPopuview.setonListener() {
+            @Override
+            public void setonlistfener(View view, int index) {
+                if (TextUtils.isEmpty(shareUrl)) {
+                    UtilTool.ShowToast(context, "分享失败");
+                    return;
+                }
+                switch (index) {
+                    case SelecPopuview.WEIBO:
+                        ShareUtils.shareSinaWei(context, title, imageUrl, true, setShareListener);
+                        break;
+                    case SelecPopuview.WEIXIN:
+                        ShareUtils.shareweixin(context, title, title, imageUrl, shareUrl, true, setShareListener);
+                        break;
+                    case SelecPopuview.FRIEND:
+                        ShareUtils.shareWechatMoments(context, title, title, imageUrl, shareUrl, true, setShareListener);
+                        break;
+                    case SelecPopuview.QQ:
+                        ShareUtils.shareQQ(context, title, shareUrl, imageUrl, true, setShareListener);
+                        break;
+                    case SelecPopuview.QQZONE:
+                        ShareUtils.shareQZone(context, title, shareUrl, imageUrl, "同城秀秀", true, setShareListener);
+                        break;
+                }
+            }
+        });
+        //设置layout在PopupWindow中显示的位置
+        picPopupWindow.showAtLocation(view, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+
     }
 }
