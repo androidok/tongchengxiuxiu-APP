@@ -86,6 +86,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
                 return true;
             }
         });
+
         WebSettings webSettings = mwebview.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowContentAccess(true);
@@ -268,6 +269,7 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
 
 
     }
+
 
     private void pushFlow() {
         String livertmpUrl = SPUtils.getlivertmpUrl(MainActivity.this);
@@ -593,11 +595,13 @@ public class MainActivity extends Activity implements YImagePicker.OnImagePicked
                 String live_url = jsonObject.getString("live_url");
                 String img = jsonObject.getString("img");
                 String url = jsonObject.getString("url");
+                String liveId = jsonObject.getString("liveId");
                 Log.d("直播播放信息", "" + live_url + ".." + url + ".." + img);
                 Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
                 intent.putExtra(Sharedparms.IntentInfo.LIVERTMPURL, live_url);
                 intent.putExtra(Sharedparms.IntentInfo.IMAGEURL, img);
                 intent.putExtra(Sharedparms.IntentInfo.WEBVIEWURL, url);
+                intent.putExtra(Sharedparms.IntentInfo.LIVEID,liveId);
                 startActivity(intent);
             } catch (JSONException e) {
 

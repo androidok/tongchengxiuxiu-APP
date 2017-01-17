@@ -44,6 +44,7 @@ import com.alivc.player.MediaPlayer;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.administrator.learn.Model.apiSuccessInfo;
+import com.example.administrator.learn.Model.checkliveInfo;
 import com.example.administrator.learn.ServceTool.ApiService;
 import com.example.administrator.learn.Tool.ShareUtils;
 import com.example.administrator.learn.Tool.Sharedparms;
@@ -57,24 +58,25 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-import static com.example.administrator.learn.R.id.video_videoview;
-
 public class PlayerActivity extends Activity {
 
     @InjectView(R.id.image_back)
     ImageView imageBack;
     @InjectView(R.id.layout_image)
     RelativeLayout layoutImage;
-    @InjectView(video_videoview)
+    @InjectView(R.id.video_videoview)
     WebView videoVideoview;
     @InjectView(R.id.layout)
     RelativeLayout layout;
+    @InjectView(R.id.tv_pause)
+    TextView tvPause;
     private String liveurl;
     private String livetmpUrl;
     private String image_url;
     private String webView_url;
     private String live_id;//分享使用
     private ProgressDialog progressDialog;
+    private String video_liveid;
 
     public interface StatusListener {
         int notifyStatus(int status);
@@ -246,8 +248,10 @@ public class PlayerActivity extends Activity {
         livetmpUrl = extras.getString(Sharedparms.IntentInfo.LIVERTMPURL);
         image_url = extras.getString(Sharedparms.IntentInfo.IMAGEURL);
         webView_url = extras.getString(Sharedparms.IntentInfo.WEBVIEWURL);
+        video_liveid = extras.getString(Sharedparms.IntentInfo.LIVEID);
 
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.e(TAG, "onCreate.");
@@ -261,6 +265,7 @@ public class PlayerActivity extends Activity {
         mPlayingIndex = -1;
         Bundle extras = getIntent().getExtras();
         getintentinfo();
+
         setVebView();
         //加载背景
         Glide.with(PlayerActivity.this)
@@ -272,12 +277,89 @@ public class PlayerActivity extends Activity {
             mPlayerControl = new PlayerControl(this);
             mPlayerControl.setControllerListener(mController);
         }
-          progressDialog = ProgressDialog.show(PlayerActivity.this, "", "加载中...");
+        progressDialog = ProgressDialog.show(PlayerActivity.this, "", "加载中...");
+        progressDialog.setCancelable(true);
         progressDialog.show();
+        checkVideo(true);
         acquireWakeLock();
 
         init();
     }
+    Handler handler=new Handler();
+    Runnable runnable=new Runnable() {
+        @Override
+        public void run() {
+            handler.postDelayed(this,5000);
+            isPausePlayer = false;
+            mPlayer.play();
+            startToPlay();
+
+        }
+    };
+    int i=0;
+
+
+    private static String status_finish = "2";//直播结束
+    private static String status_banned = "3";//被禁播
+    private static String status_ing = "4";//直播中
+
+    /**
+     * 检测直播是否结束了
+     * isstart  开始的话如果直播结束就不用结束页面，如果在播放的时候检测到直播结束了，那就要结束页面
+     */
+    private void checkVideo(final boolean isstart) {
+        ApiService.CheckLive(video_liveid, new ApiService.ParsedRequestListener<checkliveInfo>() {
+            @Override
+            public void onResponseResult(checkliveInfo checkliveInfo) {
+                if (checkliveInfo != null && Sharedparms.statusSuccess == checkliveInfo.getStatus()) {
+//                    UtilTool.ShowToast(PlayerActivity.this, checkliveInfo.toString());
+                    if (status_finish.equalsIgnoreCase(checkliveInfo.getLive_status())) {
+                        if (isstart && progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }  else if (!isstart) {
+                            UtilTool.ShowToast(PlayerActivity.this, "直播结束");
+                            finish();
+                        }
+
+                    } else if (status_banned.equalsIgnoreCase(checkliveInfo.getLive_status())) {
+                        UtilTool.ShowToast(PlayerActivity.this, "视频被禁播");
+                        finish();
+                    } else if (status_ing.equalsIgnoreCase(checkliveInfo.getLive_status())) {
+                        //直播中
+                        UtilTool.ShowToast(PlayerActivity.this,"主播稍后回来");
+                        whetherTiemer(true);
+                    }
+                }
+            }
+
+            @Override
+            public void _OnError(String errormessage) {
+                UtilTool.ShowToast(PlayerActivity.this, errormessage);
+
+            }
+        });
+
+    }
+
+    /**
+     * 定时器是否开启
+     * @param isOpen
+     */
+    private void whetherTiemer(boolean isOpen){
+        if (isOpen){
+            imageBack.setVisibility(View.VISIBLE);
+            tvPause.setVisibility(View.VISIBLE);
+            videoVideoview.setVisibility(View.GONE);
+            handler.postDelayed(runnable,5000);
+        }else {
+            imageBack.setVisibility(View.GONE);
+            tvPause.setVisibility(View.GONE);
+            videoVideoview.setVisibility(View.VISIBLE);
+            handler.removeCallbacks(runnable);
+        }
+
+    }
+
     private void setVebView() {
         WebSettings webSettings = videoVideoview.getSettings();
         webSettings.setAllowContentAccess(true);
@@ -291,7 +373,7 @@ public class PlayerActivity extends Activity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDefaultTextEncodingName("utf-8");
         videoVideoview.setBackgroundColor(0); // 设置背景色
-        videoVideoview.addJavascriptInterface(new PlayerActivity.javaScriptObjcet(), "jnoo");
+        videoVideoview.addJavascriptInterface(new javaScriptObjcet(), "jnoo");
         videoVideoview.setWebChromeClient(new WebChromeClient());
         videoVideoview.setWebViewClient(new WebViewClient() {
             @Override
@@ -302,6 +384,7 @@ public class PlayerActivity extends Activity {
         });
         videoVideoview.loadUrl(webView_url);
     }
+
     private class MyGestureListener extends SimpleOnGestureListener {
 
         @Override
@@ -323,6 +406,7 @@ public class PlayerActivity extends Activity {
             return super.onScroll(e1, e2, distanceX, distanceY);
         }
     }
+
     /**
      * js
      */
@@ -331,8 +415,9 @@ public class PlayerActivity extends Activity {
         public void livestop() {//播放时的xx
             finish();
         }
+
         @JavascriptInterface
-        public void overliveStop(){//当直播结束了，还是有人进去看，那这样网页上就是结束的页面，这个就是返回按钮的js方法
+        public void overliveStop() {//当直播结束了，还是有人进去看，那这样网页上就是结束的页面，这个就是返回按钮的js方法
             finish();
         }
 
@@ -350,12 +435,13 @@ public class PlayerActivity extends Activity {
                 String title = jsonObject.getString("title");
                 String share_url = jsonObject.getString("share_url");
                 live_id = jsonObject.getString("live_id");
-                ShareUtils.showPopuViewDialog(PlayerActivity.this, title, img, share_url, PlayerActivity.this.findViewById(R.id.layout), shareListener);
+                ShareUtils.showPopuViewDialog(PlayerActivity.this, title, img, share_url, PlayerActivity.this.findViewById(R.id.layout), false, shareListener);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
+
     /**
      * 分享回调
      */
@@ -363,11 +449,12 @@ public class PlayerActivity extends Activity {
 
         @Override
         public void shareSuccess(boolean isSuccessful, boolean iscallback) {
-            if (isSuccessful){
+            if (isSuccessful) {
                 shareLiveId();
             }
         }
     };
+
     /**
      * 分享后接口
      */
@@ -389,6 +476,7 @@ public class PlayerActivity extends Activity {
             }
         });
     }
+
     private void onVolumeSlide(int vol) {
         if (mPlayer != null) {
             mVolumn += vol;
@@ -490,7 +578,7 @@ public class PlayerActivity extends Activity {
         mTipLayout.setVisibility(bShowTip ? View.VISIBLE : View.GONE);
         mTipView.setVisibility(bShowTip ? View.VISIBLE : View.GONE);
 
-        String strValue = "Buffering...";
+        String strValue = "缓存中...";
         mTipView.setText(strValue);
     }
 
@@ -754,9 +842,10 @@ public class PlayerActivity extends Activity {
             Bundle bundle = (Bundle) getIntent().getExtras();
             mPlayer.setMediaType(MediaPlayer.MediaType.Live);
             mPlayer.setDefaultDecoder(1);
+            mPlayer.setMaxBufferDuration(60000);
 //            mPlayer.setMaxBufferDuration(0);
             // 重点: 在调试阶段可以使用以下方法打开native log
-            mPlayer.enableNativeLog();
+//            mPlayer.enableNativeLog();
 
             if (mPosition != 0) {
                 mPlayer.seekTo(mPosition);
@@ -842,7 +931,9 @@ public class PlayerActivity extends Activity {
         public void onPrepared() {
             Log.d(TAG, "onPrepared");
             if (mPlayer != null) {
-                progressDialog.dismiss();
+                if (progressDialog !=null){
+                    progressDialog.dismiss();
+                }
                 imageBack.setVisibility(View.GONE);
                 mPlayer.setVideoScalingMode(MediaPlayer.VideoScalingMode.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 //                update_total_duration(mPlayer.getDuration());
@@ -870,45 +961,66 @@ public class PlayerActivity extends Activity {
             switch (errCode) {
                 case MediaPlayer.ALIVC_ERR_LOADING_TIMEOUT:
                     report_error("缓冲超时,请确认网络连接正常后重试", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "缓冲超时,请确认网络连接正常后重试");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_NO_INPUTFILE:
                     report_error("no input file", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "出现未知错误");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_NO_VIEW:
                     report_error("no surface", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "出现未知错误");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_INVALID_INPUTFILE:
                     report_error("视频资源或者网络不可用", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "视频资源或者网络不可用");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_NO_SUPPORT_CODEC:
-                    report_error("no codec", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "出现未知错误");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_FUNCTION_DENIED:
                     report_error("no priority", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "出现未知错误");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_UNKNOWN:
                     report_error("unknown error", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "出现未知错误");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_NO_NETWORK:
                     report_error("视频资源或者网络不可用", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "视频资源或者网络不可用");
                     mPlayer.reset();
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_ILLEGALSTATUS:
                     report_error("illegal call", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "illegal call");
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_NOTAUTH:
                     report_error("auth failed", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "auth failed");
+                    finish();
                     break;
                 case MediaPlayer.ALIVC_ERR_READD:
                     report_error("资源访问失败,请重试", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "资源访问失败,请重试");
                     mPlayer.reset();
+                    finish();
                     break;
                 default:
                     break;
@@ -929,16 +1041,20 @@ public class PlayerActivity extends Activity {
                     break;
                 case MediaPlayer.MEDIA_INFO_BUFFERING_START:
 //                    pause();
-                    show_buffering_ui(true);
+                        show_buffering_ui(true);
+                    checkVideo(false);
                     break;
                 case MediaPlayer.MEDIA_INFO_BUFFERING_END:
 //                    start();
                     show_buffering_ui(false);
+                    whetherTiemer(false);
                     break;
                 case MediaPlayer.MEDIA_INFO_TRACKING_LAGGING:
                     break;
                 case MediaPlayer.MEDIA_INFO_NETWORK_ERROR:
                     report_error("系统错误", true);
+                    UtilTool.ShowToast(PlayerActivity.this, "系统错误");
+                    finish();
                     break;
                 case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
                     if (mPlayer != null)
@@ -1033,6 +1149,7 @@ public class PlayerActivity extends Activity {
             if (mPlayerControl != null)
                 mPlayerControl.stop();
         }
+        handler.removeCallbacks(runnable);
 
         super.onDestroy();
         return;

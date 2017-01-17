@@ -1,5 +1,6 @@
 package com.example.administrator.learn.ServceTool;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.androidnetworking.common.Priority;
@@ -7,9 +8,12 @@ import com.androidnetworking.error.ANError;
 import com.example.administrator.learn.Model.PersonalInfo;
 import com.example.administrator.learn.Model.StartPushInfo;
 import com.example.administrator.learn.Model.apiSuccessInfo;
+import com.example.administrator.learn.Model.checkliveInfo;
 import com.example.administrator.learn.Model.putPictureInfo;
+import com.example.administrator.learn.Model.setliveInfo;
 import com.example.administrator.learn.Model.stoppushInfo;
 import com.example.administrator.learn.Tool.Sharedparms;
+import com.example.administrator.learn.Tool.UtilTool;
 import com.google.gson.reflect.TypeToken;
 import com.rxandroidnetworking.RxAndroidNetworking;
 
@@ -177,6 +181,63 @@ public class ApiService {
                     public void onError(ANError anError) {
                         Log.d("结束直播",anError.toString());
                         parsedRequestListener._OnError(anError.getMessage());
+                    }
+                });
+    }
+    /**
+     * 检查直播是否结束
+     *
+     * @param
+     * @param liveId
+     * @param parsedRequestListener
+     */
+    public static void CheckLive( String liveId, final ParsedRequestListener<checkliveInfo> parsedRequestListener) {
+        HashMap<String, String> bodyMap = new HashMap<>();
+        bodyMap.put("liveId", liveId);
+        RxAndroidNetworking.post(Sharedparms.Http_url.URL_DOMAIN + Sharedparms.Http_url.CHECKLIVE)
+                .addBodyParameter(bodyMap)
+                .setPriority(Priority.IMMEDIATE)
+                .build()
+                .getAsParsed(new TypeToken<checkliveInfo>() {
+                }, new com.androidnetworking.interfaces.ParsedRequestListener<checkliveInfo>() {
+                    @Override
+                    public void onResponse(checkliveInfo response) {
+                        Log.d("直播是否结束",response.toString());
+                        parsedRequestListener.onResponseResult(response);
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Log.d("直播是否结束",anError.toString());
+                        parsedRequestListener._OnError(anError.getMessage());
+                    }
+                });
+    }
+    /**
+     * 告诉后台我的推流页面在后台
+     *
+     * @param
+     * @param liveId
+     * @param
+     */
+    public static void SetLive(final Context context, String liveId) {
+        HashMap<String, String> bodyMap = new HashMap<>();
+        bodyMap.put("liveId", liveId);
+        RxAndroidNetworking.post(Sharedparms.Http_url.URL_DOMAIN + Sharedparms.Http_url.SETLIVE)
+                .addBodyParameter(bodyMap)
+                .setPriority(Priority.IMMEDIATE)
+                .build()
+                .getAsParsed(new TypeToken<setliveInfo>() {
+                }, new com.androidnetworking.interfaces.ParsedRequestListener<setliveInfo>() {
+                    @Override
+                    public void onResponse(setliveInfo response) {
+                        Log.d("qingqiu",response.toString());
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        UtilTool.ShowToast(context,anError.getMessage());
+                        Log.d("qingqiu",anError.toString());
                     }
                 });
     }

@@ -47,11 +47,22 @@
             android:layout_height="match_parent"
             android:visibility="visible">
 
+
             <ImageView
                 android:id="@+id/image_back"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"/>
+            <TextView
+                android:id="@+id/tv_pause"
+                android:layout_width="wrap_content"
+                android:text="主播暂时离开中"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:textSize="25sp"
+                android:textColor="#ffffff"
+                android:visibility="gone"
+                android:layout_height="wrap_content"/>
         </RelativeLayout>
 
         <RelativeLayout

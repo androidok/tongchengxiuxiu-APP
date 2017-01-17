@@ -6,6 +6,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.administrator.learn.ServceTool.ApiService;
+
 import java.util.HashMap;
 
 import cn.sharesdk.framework.Platform;
@@ -292,8 +294,9 @@ public class ShareUtils {
      * @param shareUrl
      * @param view
      * @param setShareListener
+     * isbackground  点击分享当前页面会在后台，告诉后端
      */
-    public static  void showPopuViewDialog(final  Context context,final  String title,final  String imageUrl,final String shareUrl,final View view, final  setShareListener setShareListener) {
+    public static  void showPopuViewDialog(final  Context context, final  String title, final  String imageUrl, final String shareUrl, final View view, final boolean isbackground, final  setShareListener setShareListener) {
 
         SelecPopuview picPopupWindow = new SelecPopuview(context, new SelecPopuview.setonListener() {
             @Override
@@ -301,6 +304,10 @@ public class ShareUtils {
                 if (TextUtils.isEmpty(shareUrl)) {
                     UtilTool.ShowToast(context, "分享失败");
                     return;
+                }
+                if (isbackground){
+                    //告诉后端我当前的activity在后台运行中
+                    ApiService.SetLive(context,SPUtils.getliveid(context));
                 }
                 switch (index) {
                     case SelecPopuview.WEIBO:
@@ -325,4 +332,7 @@ public class ShareUtils {
         picPopupWindow.showAtLocation(view, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
 
     }
+
+
+
 }

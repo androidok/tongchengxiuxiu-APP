@@ -2,11 +2,14 @@ package com.example.administrator.learn;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -54,6 +57,7 @@ import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.UtilTool;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.ButterKnife;
@@ -142,42 +146,6 @@ public class PushFlowActivity extends Activity {
         }
     }
 
-//    /**
-//     * 显示popuview对话框
-//     */
-//    private void showPopuViewDialog() {
-//        SelecPopuview picPopupWindow = new SelecPopuview(this, new SelecPopuview.setonListener() {
-//            @Override
-//            public void setonlistfener(View view, int index) {
-//                String imageUrl = SPUtils.getimage_url(PushFlowActivity.this);
-//                String shareUrl = SPUtils.getshare_url(PushFlowActivity.this);
-//                if (TextUtils.isEmpty(shareUrl)) {
-//                    UtilTool.ShowToast(PushFlowActivity.this, "分享失败");
-//                    return;
-//                }
-//                switch (index) {
-//                    case SelecPopuview.WEIBO:
-//                        ShareUtils.shareSinaWei(PushFlowActivity.this, title, imageUrl, true, setShareListener);
-//                        break;
-//                    case SelecPopuview.WEIXIN:
-//                        ShareUtils.shareweixin(PushFlowActivity.this, title, title, imageUrl, shareUrl, true, setShareListener);
-//                        break;
-//                    case SelecPopuview.FRIEND:
-//                        ShareUtils.shareWechatMoments(PushFlowActivity.this, title, title, imageUrl, shareUrl, true, setShareListener);
-//                        break;
-//                    case SelecPopuview.QQ:
-//                        ShareUtils.shareQQ(PushFlowActivity.this, title, shareUrl, imageUrl, true, setShareListener);
-//                        break;
-//                    case SelecPopuview.QQZONE:
-//                        ShareUtils.shareQZone(PushFlowActivity.this, title, shareUrl, imageUrl, "同城秀秀", true, setShareListener);
-//                        break;
-//                }
-//            }
-//        });
-//        //设置layout在PopupWindow中显示的位置
-//        picPopupWindow.showAtLocation(PushFlowActivity.this.findViewById(R.id.btn_startpush), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
-//
-//    }
 
     /**
      * 开始直播接口
@@ -196,7 +164,7 @@ public class PushFlowActivity extends Activity {
                 if (StartPushInfo.getStatus() == Sharedparms.statusSuccess) {
                     SPUtils.Putliveid(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
                     SPUtils.Putshare_url(PushFlowActivity.this, StartPushInfo.getData().getShare_url());
-//                    UtilTool.ShowToast(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
+                    UtilTool.ShowToast(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
                     pushWebview.loadUrl(Sharedparms.WEBPUSH + StartPushInfo.getData().getLiveId());
                     if (isShare) {
                         //分享
@@ -510,7 +478,9 @@ public class PushFlowActivity extends Activity {
 
         getExtraData();
 
-
+        //注册广播home
+        registerReceiver(mHomeKeyEventReceiver, new IntentFilter(
+                Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         setRequestedOrientation(screenOrientation ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //采集
@@ -608,7 +578,7 @@ public class PushFlowActivity extends Activity {
 //            showPopuViewDialog();
             String image_url = SPUtils.getimage_url(PushFlowActivity.this);
             String share_url = SPUtils.getshare_url(PushFlowActivity.this);
-            ShareUtils.showPopuViewDialog(PushFlowActivity.this,title,image_url,share_url,PushFlowActivity.this.findViewById(R.id.btn_startpush),setShareListener);
+            ShareUtils.showPopuViewDialog(PushFlowActivity.this,title,image_url,share_url,PushFlowActivity.this.findViewById(R.id.btn_startpush),true,setShareListener);
         }
 
         @JavascriptInterface
@@ -697,23 +667,24 @@ public class PushFlowActivity extends Activity {
 
     @Override
     protected void onPause() {
-        if (isRecording) {
-            mMediaRecorder.stopRecord();
-        }
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_BITRATE_DOWN);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_BITRATE_RAISE);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_AUDIO_CAPTURE_OPEN_SUCC);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_DATA_DISCARD);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_INIT_DONE);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_VIDEO_ENCODER_OPEN_SUCC);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_VIDEO_ENCODER_OPEN_FAILED);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_VIDEO_ENCODED_FRAMES_FAILED);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_AUDIO_ENCODED_FRAMES_FAILED);
-        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_AUDIO_CAPTURE_OPEN_FAILED);
-        /**
-         * 如果要调用stopRecord和reset()方法，则stopRecord（）必须在reset之前调用，否则将会抛出IllegalStateException
-         */
-        mMediaRecorder.reset();
+//        if (isRecording) {
+//            mMediaRecorder.stopRecord();
+//            Log.e("是否在直播",""+isRecording);
+//        }
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_BITRATE_DOWN);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_BITRATE_RAISE);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_AUDIO_CAPTURE_OPEN_SUCC);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_DATA_DISCARD);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_INIT_DONE);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_VIDEO_ENCODER_OPEN_SUCC);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_VIDEO_ENCODER_OPEN_FAILED);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_VIDEO_ENCODED_FRAMES_FAILED);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_AUDIO_ENCODED_FRAMES_FAILED);
+//        mMediaRecorder.unSubscribeEvent(AlivcEvent.EventType.EVENT_AUDIO_CAPTURE_OPEN_FAILED);
+//        /**
+//         * 如果要调用stopRecord和reset()方法，则stopRecord（）必须在reset之前调用，否则将会抛出IllegalStateException
+//         */
+//        mMediaRecorder.reset();
         super.onPause();
     }
 
@@ -727,7 +698,22 @@ public class PushFlowActivity extends Activity {
         mMediaRecorder.stopRecord();
         mMediaRecorder.reset();
     }
-
+    // 重点:判定是否在前台工作
+    public boolean isRunningForeground() {
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcessInfos = activityManager.getRunningAppProcesses();
+        // 枚举进程
+        for (ActivityManager.RunningAppProcessInfo appProcessInfo : appProcessInfos) {
+            if (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                if (appProcessInfo.processName.equals(this.getApplicationInfo().processName)) {
+                    Log.d(TAG, "EntryActivity isRunningForeGround");
+                    return true;
+                }
+            }
+        }
+        Log.d(TAG, "EntryActivity isRunningBackGround");
+        return false;
+    }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -738,7 +724,27 @@ public class PushFlowActivity extends Activity {
         }
         return super.onKeyDown(keyCode, event);
     }
+    /**
+     * 监听是否点击了home键将客户端推到后台
+     */
+    private BroadcastReceiver mHomeKeyEventReceiver = new BroadcastReceiver() {
+        String SYSTEM_REASON = "reason";
+        String SYSTEM_HOME_KEY = "homekey";
+        String SYSTEM_HOME_KEY_LONG = "recentapps";
 
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
+                String reason = intent.getStringExtra(SYSTEM_REASON);
+                if (TextUtils.equals(reason, SYSTEM_HOME_KEY)) {
+                    //表示按了home键,程序到了后台
+                    ApiService.SetLive(PushFlowActivity.this,SPUtils.getliveid(PushFlowActivity.this));
+                }else if(TextUtils.equals(reason, SYSTEM_HOME_KEY_LONG)){
+                }
+            }
+        }
+    };
     public void testPublish(boolean isPublish, final String url) {
         if (isPublish) {
             mMediaRecorder.startRecord(url);
@@ -876,7 +882,6 @@ public class PushFlowActivity extends Activity {
 
         @Override
         public void onDeviceAttachFailed(int facing) {
-
         }
 
         @Override
@@ -889,12 +894,10 @@ public class PushFlowActivity extends Activity {
 
         @Override
         public void onSessionDetach() {
-
         }
 
         @Override
         public void onDeviceDetach() {
-
         }
 
         @Override

@@ -12,7 +12,8 @@ public class Sharedparms {
     /*
     网页
     * */
-    public static String WEBVIEW_UIL = "http://jy.leejia.cn";
+//    public static String WEBVIEW_UIL = "http://jy.leejia.cn";//测试
+    public static String WEBVIEW_UIL="http://jy.jnoo.com/";//正式
     /*
     * webview的设置useragent，但是后面需要加入版本号
     * */
@@ -64,6 +65,10 @@ public class Sharedparms {
         public static final String SHAREURL = "/index.php?s=/Live/Api/shareLive/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf/";
         //结束直播
         public static final String STOPPUSH = "/index.php?s=/Live/Api/overLive/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf";
+        //检测直播是否结束
+        public static final String CHECKLIVE = "/index.php?s=/Live/Api/checkLive/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf";
+        //告诉后台我的推流页面在后台
+    public static final String SETLIVE="/index.php?s=/Live/Api/setLive/key/jnooo/vcode/9441020bd47843e473c78bb4861639cf";
     }
 
     /**
@@ -85,22 +90,24 @@ public class Sharedparms {
     /**
      * 阿里云直播信息
      */
-    public static class alyInfo{
+    public static class alyInfo {
         //直播播放信息
-        public static final String   accessKeyId="LTAIApiow5n3jvqq";
-        public static final String accessKeySecret="vNASpS4FkdYR5cq8vItLYQdppzSQ2J";
+        public static final String accessKeyId = "LTAIApiow5n3jvqq";
+        public static final String accessKeySecret = "vNASpS4FkdYR5cq8vItLYQdppzSQ2J";
     }
 
     /**
      * 常用
      */
-    public static class IntentInfo{
+    public static class IntentInfo {
         //播放地址
-        public static final String LIVERTMPURL="livertmpUrl";
+        public static final String LIVERTMPURL = "livertmpUrl";
         //封面地址
-        public static final String IMAGEURL="imageUrl";
+        public static final String IMAGEURL = "imageUrl";
         //网页地址
-        public static final String WEBVIEWURL="webviewUrl";
+        public static final String WEBVIEWURL = "webviewUrl";
+        //视频对方的liveId
+        public static final String LIVEID = "liveId";
 
     }
 
