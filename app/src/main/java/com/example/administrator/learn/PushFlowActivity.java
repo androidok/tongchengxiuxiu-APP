@@ -15,6 +15,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -51,10 +52,16 @@ import com.duanqu.qupai.logger.DataStatistics;
 import com.example.administrator.learn.Model.StartPushInfo;
 import com.example.administrator.learn.Model.apiSuccessInfo;
 import com.example.administrator.learn.ServceTool.ApiService;
+import com.example.administrator.learn.Tool.EvenbusInfo;
+import com.example.administrator.learn.Tool.PayUtil;
 import com.example.administrator.learn.Tool.SPUtils;
 import com.example.administrator.learn.Tool.ShareUtils;
 import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.UtilTool;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
 import java.util.List;
@@ -105,6 +112,8 @@ public class PushFlowActivity extends Activity {
     private ProgressDialog progressDialog;
     private AlertDialog.Builder builder;
     private String title;//标题
+    private String push_share_content = "我在直播间直播，欢迎来观看吧！";
+    private String webview_url;
 
     @OnClick({R.id.btn_startpush, R.id.image_cameraresvise, R.id.image_xx, R.id.layout_weibo, R.id.layout_wexin, R.id.layout_friend
             , R.id.layout_qq, R.id.layout_qqzone})
@@ -164,8 +173,9 @@ public class PushFlowActivity extends Activity {
                 if (StartPushInfo.getStatus() == Sharedparms.statusSuccess) {
                     SPUtils.Putliveid(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
                     SPUtils.Putshare_url(PushFlowActivity.this, StartPushInfo.getData().getShare_url());
-                    UtilTool.ShowToast(PushFlowActivity.this, StartPushInfo.getData().getLiveId() + "");
-                    pushWebview.loadUrl(Sharedparms.WEBPUSH + StartPushInfo.getData().getLiveId());
+
+                    webview_url=Sharedparms.WEBVIEW_UIL + Sharedparms.WEBPUSH + StartPushInfo.getData().getLiveId();
+                    pushWebview.loadUrl(webview_url);
                     if (isShare) {
                         //分享
                         share(index, title, StartPushInfo.getData().getShare_url());
@@ -198,6 +208,7 @@ public class PushFlowActivity extends Activity {
         isRecording = true;
     }
 
+
     /**
      * 分享
      *
@@ -206,19 +217,19 @@ public class PushFlowActivity extends Activity {
     private void share(int index, String title, String share_url) {
         switch (index) {
             case WEIBO:
-                ShareUtils.shareSinaWei(PushFlowActivity.this, title, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
+                ShareUtils.shareSinaWei(PushFlowActivity.this, push_share_content, title, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
                 break;
             case WEIXIN:
-                ShareUtils.shareweixin(PushFlowActivity.this, title, title, SPUtils.getimage_url(PushFlowActivity.this), share_url, false, setShareListener);
+                ShareUtils.shareweixin(PushFlowActivity.this, push_share_content, title, SPUtils.getimage_url(PushFlowActivity.this), share_url, false, setShareListener);
                 break;
             case FRIEND:
-                ShareUtils.shareWechatMoments(PushFlowActivity.this, title, title, SPUtils.getimage_url(PushFlowActivity.this), share_url, false, setShareListener);
+                ShareUtils.shareWechatMoments(PushFlowActivity.this, push_share_content, title, SPUtils.getimage_url(PushFlowActivity.this), share_url, false, setShareListener);
                 break;
             case QQ:
-                ShareUtils.shareQQ(PushFlowActivity.this, title, share_url, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
+                ShareUtils.shareQQ(PushFlowActivity.this, push_share_content, title, share_url, SPUtils.getimage_url(PushFlowActivity.this), false, setShareListener);
                 break;
             case QQZONE:
-                ShareUtils.shareQZone(PushFlowActivity.this, title, share_url, SPUtils.getimage_url(PushFlowActivity.this), "同城秀秀", false, setShareListener);
+                ShareUtils.shareQZone(PushFlowActivity.this, push_share_content, title, share_url, SPUtils.getimage_url(PushFlowActivity.this), "同城秀秀", false, setShareListener);
                 break;
         }
     }
@@ -455,6 +466,7 @@ public class PushFlowActivity extends Activity {
     private boolean isRecording = false;
     private int mPreviewWidth = 0;
     private int mPreviewHeight = 0;
+    public static PushFlowActivity pushFlowActivity;
     private DataStatistics mDataStatistics = new DataStatistics(1000);
 
     public static void startActivity(Context context,
@@ -470,6 +482,8 @@ public class PushFlowActivity extends Activity {
 //        RecordLoggerManager.createLoggerFile();
         setContentView(R.layout.activity_push_flow);
         ButterKnife.inject(this);
+        EventBus.getDefault().register(this);
+        pushFlowActivity=this;
         if (Build.VERSION.SDK_INT >= 23) {
 //            permissionCheck();
         } else {
@@ -561,8 +575,46 @@ public class PushFlowActivity extends Activity {
         pushWebview.addJavascriptInterface(new javaScriptObjcet(), "jnoo");
         pushWebview.setWebChromeClient(new WebChromeClient());
     }
+    private static int SDK_PAY_FLAG = 3;//支付宝支付
+    Handler Mhandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == SDK_PAY_FLAG) {//支付宝支付
+                String result = (String) msg.obj;
+                Log.d("支付宝支付返回数据",""+result);
+                String substring = result.split(";")[0].split("=")[1];
+                String resultStatus = substring.substring(1, substring.length() - 1);
+                pushWebview.reload();
+                if ("9000".equalsIgnoreCase(resultStatus)) {
+                    UtilTool.ShowToast(PushFlowActivity.this,"支付成功");
 
+                } else {
+                    UtilTool.ShowToast(PushFlowActivity.this,"支付失败或者取消");
 
+                }
+            }
+
+        }
+    };
+    /**
+     * 微信回调页面传过来，判断是否支付成功
+     *
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(EvenbusInfo event) {
+        int respCode = event.getRespCode();
+        if (respCode == 0) {//成功
+            UtilTool.ShowToast(PushFlowActivity.this,"支付成功"+webview_url);
+            pushWebview.reload();
+        } else if (respCode == -1) {//失败
+            UtilTool.ShowToast(PushFlowActivity.this,"支付失败");
+        } else if (respCode == -2) {//取消支付
+            UtilTool.ShowToast(PushFlowActivity.this,"支付取消");
+        }
+
+    }
     /**
      * js
      */
@@ -578,9 +630,21 @@ public class PushFlowActivity extends Activity {
 //            showPopuViewDialog();
             String image_url = SPUtils.getimage_url(PushFlowActivity.this);
             String share_url = SPUtils.getshare_url(PushFlowActivity.this);
-            ShareUtils.showPopuViewDialog(PushFlowActivity.this,title,image_url,share_url,PushFlowActivity.this.findViewById(R.id.btn_startpush),true,setShareListener);
+            ShareUtils.showPopuViewDialog(PushFlowActivity.this, push_share_content, title, image_url, share_url, PushFlowActivity.this.findViewById(R.id.btn_startpush), true, setShareListener);
         }
 
+        @JavascriptInterface
+        public void WXpay(String wxPayInfo) {
+            if (TextUtils.isEmpty(wxPayInfo)) {
+                Toast.makeText(PushFlowActivity.this, "服务器异常", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            PayUtil.getInstance(PushFlowActivity.this).wxPay(wxPayInfo);
+        }
+        @JavascriptInterface
+        public void Zhipay(final String payJsInfo) {
+            PayUtil.getInstance(PushFlowActivity.this).zhiPay(Mhandler,payJsInfo);
+        }
         @JavascriptInterface
         public void switchCamera() {
             //切换摄像头
@@ -693,11 +757,13 @@ public class PushFlowActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 //        RecordLoggerManager.closeLoggerFile();
+        EventBus.getDefault().unregister(this);
         mDataStatistics.stop();
         mMediaRecorder.release();
         mMediaRecorder.stopRecord();
         mMediaRecorder.reset();
     }
+
     // 重点:判定是否在前台工作
     public boolean isRunningForeground() {
         ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
@@ -714,6 +780,7 @@ public class PushFlowActivity extends Activity {
         Log.d(TAG, "EntryActivity isRunningBackGround");
         return false;
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -724,6 +791,7 @@ public class PushFlowActivity extends Activity {
         }
         return super.onKeyDown(keyCode, event);
     }
+
     /**
      * 监听是否点击了home键将客户端推到后台
      */
@@ -739,12 +807,13 @@ public class PushFlowActivity extends Activity {
                 String reason = intent.getStringExtra(SYSTEM_REASON);
                 if (TextUtils.equals(reason, SYSTEM_HOME_KEY)) {
                     //表示按了home键,程序到了后台
-                    ApiService.SetLive(PushFlowActivity.this,SPUtils.getliveid(PushFlowActivity.this));
-                }else if(TextUtils.equals(reason, SYSTEM_HOME_KEY_LONG)){
+                    ApiService.SetLive(PushFlowActivity.this, SPUtils.getliveid(PushFlowActivity.this));
+                } else if (TextUtils.equals(reason, SYSTEM_HOME_KEY_LONG)) {
                 }
             }
         }
     };
+
     public void testPublish(boolean isPublish, final String url) {
         if (isPublish) {
             mMediaRecorder.startRecord(url);
@@ -916,7 +985,8 @@ public class PushFlowActivity extends Activity {
             AlertDialog.Builder builder = UtilTool.creatDialog(PushFlowActivity.this, "错误提示", "当前网络状态极差，已无法正常流畅直播，确认要继续直播吗？", "关闭", new UtilTool.SetonListener<DialogInterface>() {
                 @Override
                 public void setonlistener(DialogInterface dialogInterface, int i) {
-                    PushFlowActivity.this.finish();
+                    startActivity(new Intent(PushFlowActivity.this, StopPushActivity.class));
+                    finish();
                 }
             });
             builder.setCancelable(true);
@@ -1023,28 +1093,27 @@ public class PushFlowActivity extends Activity {
 
             switch (errorCode) {
                 case AlivcStatusCode.ERROR_ILLEGAL_ARGUMENT://非法参数
-                    UtilTool.ShowToast(PushFlowActivity.this,"非法参数");
+                    UtilTool.ShowToast(PushFlowActivity.this, "非法参数");
                     showIllegalArgumentDialog("-22错误产生");
                     break;
                 case AlivcStatusCode.ERROR_SERVER_CLOSED_CONNECTION://-104
                     finish();
                     break;
                 case AlivcStatusCode.ERORR_OUT_OF_MEMORY://内存不足
-                    UtilTool.ShowToast(PushFlowActivity.this,"内存不足");
+                    UtilTool.ShowToast(PushFlowActivity.this, "内存不足");
                     break;
                 case AlivcStatusCode.ERROR_CONNECTION_TIMEOUT:
                 case AlivcStatusCode.ERROR_BROKEN_PIPE://管道中断
 
-                    UtilTool.ShowToast(PushFlowActivity.this,"管道中断");
+                    UtilTool.ShowToast(PushFlowActivity.this, "管道中断");
                     break;
                 case AlivcStatusCode.ERROR_IO://IO
 
-                    UtilTool.ShowToast(PushFlowActivity.this,"IO");
+                    UtilTool.ShowToast(PushFlowActivity.this, "IO");
                     break;
                 case AlivcStatusCode.ERROR_NETWORK_UNREACHABLE://网络不可达
-                    UtilTool.ShowToast(PushFlowActivity.this,"网络不可达");
-                        break;
-
+                    UtilTool.ShowToast(PushFlowActivity.this, "网络不可达");
+                    break;
 
 
                 default:

@@ -38,6 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alivc.player.AliVcMediaPlayer;
 import com.alivc.player.MediaPlayer;
@@ -46,10 +47,15 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.administrator.learn.Model.apiSuccessInfo;
 import com.example.administrator.learn.Model.checkliveInfo;
 import com.example.administrator.learn.ServceTool.ApiService;
+import com.example.administrator.learn.Tool.EvenbusInfo;
+import com.example.administrator.learn.Tool.PayUtil;
 import com.example.administrator.learn.Tool.ShareUtils;
 import com.example.administrator.learn.Tool.Sharedparms;
 import com.example.administrator.learn.Tool.UtilTool;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -136,7 +142,8 @@ public class PlayerActivity extends Activity {
     private boolean isPausedByUser = false;
     //用来控制应用前后台切换的逻辑
     private boolean isCurrentRunningForeground = true;
-
+    private String playvideo_share_content = "我在看直播，一起来吧！";
+    public static PlayerActivity playerActivity;
     // 重点:发生从wifi切换到4g时,提示用户是否需要继续播放,此处有两种做法:
     // 1.从历史位置从新播放
     // 2.暂停播放,因为存在网络切换,续播有时会不成功
@@ -262,6 +269,8 @@ public class PlayerActivity extends Activity {
         registerReceiver(connectionReceiver, intentFilter);
         setContentView(R.layout.activity_play);
         ButterKnife.inject(this);
+        EventBus.getDefault().register(this);
+        playerActivity=this;
         mPlayingIndex = -1;
         Bundle extras = getIntent().getExtras();
         getintentinfo();
@@ -285,19 +294,38 @@ public class PlayerActivity extends Activity {
 
         init();
     }
-    Handler handler=new Handler();
-    Runnable runnable=new Runnable() {
+
+    Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            handler.postDelayed(this,5000);
+            handler.postDelayed(this, 5000);
             isPausePlayer = false;
             mPlayer.play();
             startToPlay();
 
         }
     };
-    int i=0;
+    private static int SDK_PAY_FLAG = 3;//支付宝支付
+    Handler Mhandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == SDK_PAY_FLAG) {//支付宝支付
+                String result = (String) msg.obj;
+                String substring = result.split(";")[0].split("=")[1];
+                String resultStatus = substring.substring(1, substring.length() - 1);
+                videoVideoview.reload();
+                if ("9000".equalsIgnoreCase(resultStatus)) {
+                    UtilTool.ShowToast(PlayerActivity.this,"支付成功");
+                } else {
+                    UtilTool.ShowToast(PlayerActivity.this,"支付失败或者取消");
 
+                }
+            }
+
+        }
+    };
 
     private static String status_finish = "2";//直播结束
     private static String status_banned = "3";//被禁播
@@ -316,7 +344,7 @@ public class PlayerActivity extends Activity {
                     if (status_finish.equalsIgnoreCase(checkliveInfo.getLive_status())) {
                         if (isstart && progressDialog != null && progressDialog.isShowing()) {
                             progressDialog.dismiss();
-                        }  else if (!isstart) {
+                        } else if (!isstart) {
                             UtilTool.ShowToast(PlayerActivity.this, "直播结束");
                             finish();
                         }
@@ -326,7 +354,7 @@ public class PlayerActivity extends Activity {
                         finish();
                     } else if (status_ing.equalsIgnoreCase(checkliveInfo.getLive_status())) {
                         //直播中
-                        UtilTool.ShowToast(PlayerActivity.this,"主播稍后回来");
+                        UtilTool.ShowToast(PlayerActivity.this, "主播稍后回来");
                         whetherTiemer(true);
                     }
                 }
@@ -340,18 +368,36 @@ public class PlayerActivity extends Activity {
         });
 
     }
+    /**
+     * 微信回调页面传过来，判断是否支付成功
+     *
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEventMainThread(EvenbusInfo event) {
+        int respCode = event.getRespCode();
+        if (respCode == 0) {//成功
+            UtilTool.ShowToast(PlayerActivity.this,"支付成功");
+            videoVideoview.reload();
+        } else if (respCode == -1) {//失败
+            UtilTool.ShowToast(PlayerActivity.this,"支付失败");
+        } else if (respCode == -2) {//取消支付
+            UtilTool.ShowToast(PlayerActivity.this,"取消支付");
+        }
 
+    }
     /**
      * 定时器是否开启
+     *
      * @param isOpen
      */
-    private void whetherTiemer(boolean isOpen){
-        if (isOpen){
+    private void whetherTiemer(boolean isOpen) {
+        if (isOpen) {
             imageBack.setVisibility(View.VISIBLE);
             tvPause.setVisibility(View.VISIBLE);
             videoVideoview.setVisibility(View.GONE);
-            handler.postDelayed(runnable,5000);
-        }else {
+            handler.postDelayed(runnable, 5000);
+        } else {
             imageBack.setVisibility(View.GONE);
             tvPause.setVisibility(View.GONE);
             videoVideoview.setVisibility(View.VISIBLE);
@@ -421,7 +467,18 @@ public class PlayerActivity extends Activity {
             finish();
         }
 
-
+        @JavascriptInterface
+        public void WXpay(String wxPayInfo) {
+            if (TextUtils.isEmpty(wxPayInfo)) {
+                Toast.makeText(PlayerActivity.this, "服务器异常", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            PayUtil.getInstance(PlayerActivity.this).wxPay(wxPayInfo);
+        }
+        @JavascriptInterface
+        public void Zhipay(final String payJsInfo) {
+            PayUtil.getInstance(PlayerActivity.this).zhiPay(Mhandler,payJsInfo);
+        }
         @JavascriptInterface
         public void liveShare(String data) {//播放时的
             //开始分享
@@ -435,7 +492,7 @@ public class PlayerActivity extends Activity {
                 String title = jsonObject.getString("title");
                 String share_url = jsonObject.getString("share_url");
                 live_id = jsonObject.getString("live_id");
-                ShareUtils.showPopuViewDialog(PlayerActivity.this, title, img, share_url, PlayerActivity.this.findViewById(R.id.layout), false, shareListener);
+                ShareUtils.showPopuViewDialog(PlayerActivity.this, playvideo_share_content, title, img, share_url, PlayerActivity.this.findViewById(R.id.layout), false, shareListener);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -931,7 +988,7 @@ public class PlayerActivity extends Activity {
         public void onPrepared() {
             Log.d(TAG, "onPrepared");
             if (mPlayer != null) {
-                if (progressDialog !=null){
+                if (progressDialog != null) {
                     progressDialog.dismiss();
                 }
                 imageBack.setVisibility(View.GONE);
@@ -1041,7 +1098,7 @@ public class PlayerActivity extends Activity {
                     break;
                 case MediaPlayer.MEDIA_INFO_BUFFERING_START:
 //                    pause();
-                        show_buffering_ui(true);
+                    show_buffering_ui(true);
                     checkVideo(false);
                     break;
                 case MediaPlayer.MEDIA_INFO_BUFFERING_END:
@@ -1132,6 +1189,7 @@ public class PlayerActivity extends Activity {
     @Override
     protected void onDestroy() {
         Log.e(TAG, "AudioRender: onDestroy.");
+        EventBus.getDefault().unregister(this);
         if (mPlayer != null) {
 //            stop();
             mTimerHandler.removeCallbacks(mRunnable);

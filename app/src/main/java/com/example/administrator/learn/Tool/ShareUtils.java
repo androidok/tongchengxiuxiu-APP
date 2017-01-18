@@ -69,14 +69,14 @@ public class ShareUtils {
      * 微信分享最好绕过审核分享，这样造成分享朋友圈的时分享的url不显示，而且需要设置分享类型
      * 微信朋友分享
      *
-     * @param text
+     * @param title
      * @param imageUrl setShareListener 接口回调出去
      *                 iscallback 是否要告诉后台使用
      */
-    public static void shareweixin(final Context context, String title, String text, String imageUrl, String wechatUrl, final boolean iscallback, final setShareListener setShareListener) {
+    public static void shareweixin(final Context context, String content, String title, String imageUrl, String wechatUrl, final boolean iscallback, final setShareListener setShareListener) {
         Wechat.ShareParams wechat = new Wechat.ShareParams();
         wechat.setShareType(Platform.SHARE_WEBPAGE);
-        wechat.setText(text);
+        wechat.setText(content);
         wechat.setTitle(title);
         wechat.setImageUrl(imageUrl);
         wechat.setUrl(wechatUrl);
@@ -118,15 +118,15 @@ public class ShareUtils {
      *
      * @param context
      * @param title
-     * @param text
+     * @param
      * @param imageUrl
      * @param wechatUrl
      * @param setShareListener
      */
-    public static void shareWechatMoments(final Context context, String title, String text, String imageUrl, String wechatUrl, final boolean iscallback, final setShareListener setShareListener) {
+    public static void shareWechatMoments(final Context context,String content, String title, String imageUrl, String wechatUrl, final boolean iscallback, final setShareListener setShareListener) {
         WechatMoments.ShareParams wechatMoments = new WechatMoments.ShareParams();
         wechatMoments.setShareType(Platform.SHARE_WEBPAGE);
-        wechatMoments.setText(text);
+        wechatMoments.setText(content);
         wechatMoments.setTitle(title);
         wechatMoments.setImageUrl(imageUrl);
         wechatMoments.setUrl(wechatUrl);
@@ -165,13 +165,15 @@ public class ShareUtils {
     /**
      * 新浪微博分享
      *
-     * @param text
+     * @param title 标题
+     *  content  内容
      * @param imageUrl setShareListener 接口回调出去
      */
-    public static void shareSinaWei(final Context context, String text, String imageUrl, final boolean iscallback, final setShareListener setShareListener) {
+    public static void shareSinaWei(final Context context, String content,String title, String imageUrl, final boolean iscallback, final setShareListener setShareListener) {
         SinaWeibo.ShareParams sp = new SinaWeibo.ShareParams();
-        sp.setText(text);
+        sp.setText(content);
         sp.setImageUrl(imageUrl);
+        sp.setTitle(title);
         Platform weibo = ShareSDK.getPlatform(SinaWeibo.NAME);
         weibo.setPlatformActionListener(new PlatformActionListener() {
             @Override
@@ -205,13 +207,15 @@ public class ShareUtils {
     /**
      * qq分享
      *
-     * @param text
+     * @param content 内容
      * @param url
+     * title 标题
      * @param imageUrl setShareListener 接口回调出去
      */
-    public static void shareQQ(final Context context, String text, String url, String imageUrl, final boolean iscallback, final setShareListener setShareListener) {
+    public static void shareQQ(final Context context, String content,String title, String url, String imageUrl, final boolean iscallback, final setShareListener setShareListener) {
         QQ.ShareParams sp = new QQ.ShareParams();
-        sp.setText(text);
+        sp.setText(content);
+        sp.setTitle(title);
         sp.setImageUrl(imageUrl);
         sp.setTitleUrl(url);
         Platform weibo = ShareSDK.getPlatform(QQ.NAME);
@@ -247,13 +251,15 @@ public class ShareUtils {
     /**
      * qq空间分享
      *
-     * @param text
+     * @param content 内容
      * @param url
+     * title标题
      * @param imageUrl setShareListener 接口回调出去
      */
-    public static void shareQZone(final Context context, String text, String url, String imageUrl, String appName, final boolean iscallback, final setShareListener setShareListener) {
+    public static void shareQZone(final Context context, String content,String title, String url, String imageUrl, String appName, final boolean iscallback, final setShareListener setShareListener) {
         QZone.ShareParams sp = new QZone.ShareParams();
-        sp.setText(text);
+        sp.setText(content);
+        sp.setTitle(title);
         sp.setImageUrl(imageUrl);
         sp.setTitleUrl(url);
         sp.setSite(appName);
@@ -296,7 +302,7 @@ public class ShareUtils {
      * @param setShareListener
      * isbackground  点击分享当前页面会在后台，告诉后端
      */
-    public static  void showPopuViewDialog(final  Context context, final  String title, final  String imageUrl, final String shareUrl, final View view, final boolean isbackground, final  setShareListener setShareListener) {
+    public static  void showPopuViewDialog(final  Context context,final String content, final  String title, final  String imageUrl, final String shareUrl, final View view, final boolean isbackground, final  setShareListener setShareListener) {
 
         SelecPopuview picPopupWindow = new SelecPopuview(context, new SelecPopuview.setonListener() {
             @Override
@@ -311,19 +317,19 @@ public class ShareUtils {
                 }
                 switch (index) {
                     case SelecPopuview.WEIBO:
-                        ShareUtils.shareSinaWei(context, title, imageUrl, true, setShareListener);
+                        ShareUtils.shareSinaWei(context,content, title, imageUrl, true, setShareListener);
                         break;
                     case SelecPopuview.WEIXIN:
-                        ShareUtils.shareweixin(context, title, title, imageUrl, shareUrl, true, setShareListener);
+                        ShareUtils.shareweixin(context, content, title, imageUrl, shareUrl, true, setShareListener);
                         break;
                     case SelecPopuview.FRIEND:
-                        ShareUtils.shareWechatMoments(context, title, title, imageUrl, shareUrl, true, setShareListener);
+                        ShareUtils.shareWechatMoments(context, content, title, imageUrl, shareUrl, true, setShareListener);
                         break;
                     case SelecPopuview.QQ:
-                        ShareUtils.shareQQ(context, title, shareUrl, imageUrl, true, setShareListener);
+                        ShareUtils.shareQQ(context,content, title, shareUrl, imageUrl, true, setShareListener);
                         break;
                     case SelecPopuview.QQZONE:
-                        ShareUtils.shareQZone(context, title, shareUrl, imageUrl, "同城秀秀", true, setShareListener);
+                        ShareUtils.shareQZone(context,content, title, shareUrl, imageUrl, "同城秀秀", true, setShareListener);
                         break;
                 }
             }

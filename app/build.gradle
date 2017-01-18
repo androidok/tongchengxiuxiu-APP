@@ -43,7 +43,6 @@ dependencies {
     compile files('libs/ShareSDK-Wechat-Core-2.7.10.jar')
     compile files('libs/ShareSDK-Wechat-Moments-2.7.10.jar')
     compile files('libs/libammsdk.jar')
-    compile files('libs/alipaySdk-20160825.jar')
     compile 'com.android.support:appcompat-v7:22.2.1'
     testCompile 'junit:junit:4.12'
     compile 'org.greenrobot:eventbus:3.0.0'
@@ -58,4 +57,5 @@ dependencies {
     compile 'com.amitshekhar.android:rx-android-networking:0.1.0'
     compile 'org.apache.httpcomponents:httpcore:4.4.1'
     compile files('libs/alivc-player-2.2.0.13.jar')
+    compile files('libs/alipaySdk-20160825.jar')
 }

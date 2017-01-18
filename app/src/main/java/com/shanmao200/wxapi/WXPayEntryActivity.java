@@ -2,13 +2,8 @@ package com.shanmao200.wxapi;
 
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.administrator.learn.R;
 import com.example.administrator.learn.Tool.EvenbusInfo;
@@ -54,7 +49,6 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 
     @Override
     public void onResp(BaseResp resp) {
-        Log.d(TAG, "微信支付" + resp.errCode);
         if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
             EvenbusInfo evenbusInfo=new EvenbusInfo();
             evenbusInfo.setRespCode(resp.errCode);

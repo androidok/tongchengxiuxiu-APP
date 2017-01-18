@@ -21,7 +21,7 @@ public class Sharedparms {
     /*
     * 直播那个黑白页
     * */
-    public static String WEBPUSH = "http://jy.leejia.cn/index.php?s=/Live/Index/mylive/live_id/";
+    public static String WEBPUSH = "/index.php?s=/Live/Index/mylive/live_id/";
 
     /**
      * 微信appid和appidsecret
