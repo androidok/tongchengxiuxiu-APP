@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/image01"
+            android:id="@+id/image_red_hall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -21,6 +21,7 @@
             android:src="@mipmap/red_hall_default" />
 
         <TextView
+            android:id="@+id/tv_red_hall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -38,6 +39,7 @@
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/image_lock_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -45,6 +47,7 @@
             android:src="@mipmap/luck_list_default" />
 
         <TextView
+            android:id="@+id/tv_lock_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -61,6 +64,7 @@
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/image_invitation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -68,6 +72,7 @@
             android:src="@mipmap/invitation_default" />
 
         <TextView
+            android:id="@+id/tv_invitation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -84,6 +89,7 @@
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/image_me"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -91,6 +97,7 @@
             android:src="@mipmap/me_default" />
 
         <TextView
+            android:id="@+id/tv_me"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

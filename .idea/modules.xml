@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ReadPacket/ReadPacket.iml" filepath="$PROJECT_DIR$/ReadPacket/ReadPacket.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library_pullToRefresh/library_pullToRefresh.iml" filepath="$PROJECT_DIR$/library_pullToRefresh/library_pullToRefresh.iml" />
       <module fileurl="file://$PROJECT_DIR$/tongchengxiuxiu-APP.iml" filepath="$PROJECT_DIR$/tongchengxiuxiu-APP.iml" />
     </modules>
   </component>
