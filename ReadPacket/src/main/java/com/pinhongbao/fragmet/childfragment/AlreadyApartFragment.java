@@ -2,12 +2,14 @@ package com.pinhongbao.fragmet.childfragment;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
@@ -15,6 +17,8 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.pinhongbao.Adapter.HomeAdapter;
 import com.pinhongbao.Model.homeInfo;
 import com.pinhongbao.R;
+import com.pinhongbao.Util.SPUtils;
+import com.pinhongbao.activity.DetailActivity;
 import com.pinhongbao.serviceTool.ApiService;
 
 import java.util.ArrayList;
@@ -76,6 +80,16 @@ public class AlreadyApartFragment extends Fragment {
                         getData(page);
                     }
                 });
+        mPullRefreshListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                homeInfo homeInfo = homeInfoList.get(i);
+
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra("rid",homeInfo.getId());
+                startActivity(intent);
+            }
+        });
     }
 
     /**
@@ -83,7 +97,7 @@ public class AlreadyApartFragment extends Fragment {
      */
     private void getData(int page) {
         progressDialog.show();
-        ApiService.gethomeInfo(getActivity(), "2", "23", page, new ApiService.ParsedRequestListener<List<homeInfo>>() {
+        ApiService.gethomeInfo(getActivity(), SPUtils.getUid(getActivity()),"2", "23", page, new ApiService.ParsedRequestListener<List<homeInfo>>() {
             @Override
             public void onResponseResult(List<homeInfo> homeInfo) {
                 Log.e("加载数据",""+homeInfo.toString());

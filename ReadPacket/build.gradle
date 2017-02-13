@@ -47,4 +47,7 @@ dependencies {
     compile files('libs/ShareSDK-Wechat-2.7.10.jar')
     compile files('libs/ShareSDK-Wechat-Core-2.7.10.jar')
     compile files('libs/ShareSDK-Wechat-Moments-2.7.10.jar')
+    compile 'org.greenrobot:eventbus:3.0.0'
+    /*微信支付*/
+    compile files('libs/libammsdk.jar')
 }

@@ -15,13 +15,15 @@
             android:background="@mipmap/groundback_head">
 
             <ImageView
+                android:id="@+id/image_head"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerInParent="true"
-                android:background="@mipmap/logo"/>
+                />
 
             <TextView
+                android:id="@+id/tv_niname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
@@ -62,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="10dp"
-                    android:text="1"
+                    android:text="0"
                     android:textColor="@color/color_jnon_selector"/>
 
                 <TextView
@@ -299,7 +301,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
-                android:background="@mipmap/ic_promote_detail"/>
+                android:background="@mipmap/ic_service"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -324,7 +326,42 @@
             android:layout_height="0.1dp"
             android:layout_marginLeft="20dp"
             android:background="@color/color_gray"></View>
+        <RelativeLayout
+            android:id="@+id/layout_rule"
+            android:layout_width="match_parent"
+            android:layout_height="48dp">
 
+            <ImageView
+                android:id="@+id/image_rule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:background="@mipmap/ic_laws"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@+id/image_rule"
+                android:text="玩法规则"
+                android:textColor="#000000"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:background="@mipmap/ic_me_rigtht"/>
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_marginLeft="20dp"
+            android:background="@color/color_gray"></View>
         <RelativeLayout
             android:id="@+id/layout_layout"
             android:layout_width="match_parent"
@@ -336,7 +373,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
-                android:background="@mipmap/ic_promote_detail"/>
+                android:background="@mipmap/loyout"/>
 
             <TextView
                 android:layout_width="wrap_content"

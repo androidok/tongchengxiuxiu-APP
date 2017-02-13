@@ -16,8 +16,12 @@ import org.xmlpull.v1.XmlPullParser;
 import java.io.StringReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -309,6 +313,31 @@ public class UtilTool {
 
         return timeString;
 
+    }
+
+    /**时间转换时间格式
+     * @param time
+     * @return
+     */
+    public static String timedate(String time) {
+        SimpleDateFormat sdr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        @SuppressWarnings("unused")
+        long lcc = Long.valueOf(time);
+        int i = Integer.parseInt(time);
+        String times = sdr.format(new Date(i * 1000L));
+        return times;
+
+    }
+
+    public static String getTodayDateTimes() {
+        SimpleDateFormat format = new SimpleDateFormat("MM月dd日",
+                Locale.getDefault());
+        return format.format(new Date());
+    }
+    public static String floatzhu(float s){
+        DecimalFormat decimalFormat=new DecimalFormat("0.0");//构造方法的字符格式这里如果小数不足2位,会以0补足.//保留一位小数
+        String p=decimalFormat.format(s);
+        return p;
     }
     /**
      * 对话框提示

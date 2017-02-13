@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.pinhongbao.R;
+import com.pinhongbao.Util.SPUtils;
 import com.pinhongbao.activity.LoginActivity;
 import com.pinhongbao.activity.SendRedEnvelopeActivity;
 
@@ -25,8 +27,6 @@ import butterknife.OnClick;
 public class RedhallFragment extends Fragment {
 
 
-    @InjectView(R.id.login)
-    TextView login;
     @InjectView(R.id.inti)
     TextView inti;
     @InjectView(R.id.btn_nojoin)
@@ -51,7 +51,7 @@ public class RedhallFragment extends Fragment {
         ButterKnife.reset(this);
     }
 
-    @OnClick({R.id.btn_nojoin, R.id.btn_join, R.id.login, R.id.inti})
+    @OnClick({R.id.btn_nojoin, R.id.btn_join,  R.id.inti})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_join://已经参与
@@ -60,11 +60,13 @@ public class RedhallFragment extends Fragment {
             case R.id.btn_nojoin://未参与
                 selector(0);
                 break;
-            case R.id.login:
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                break;
             case R.id.inti://发起
-                startActivity(new Intent(getActivity(), SendRedEnvelopeActivity.class));
+                if (TextUtils.isEmpty(SPUtils.getUid(getActivity()))){
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                }else {
+
+                    startActivity(new Intent(getActivity(), SendRedEnvelopeActivity.class));
+                }
                 break;
         }
     }

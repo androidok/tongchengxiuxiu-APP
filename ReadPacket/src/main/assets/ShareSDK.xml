@@ -96,16 +96,16 @@
     <Wechat
         Id="4"
         SortId="4"
-        AppId="wx7c35ac6495868a48"
-        AppSecret="ec9423ddc4c6ec73395f0da8de91afbd"
+        AppId="wxf255d360efc94eb6"
+        AppSecret="af1c6a083f690fa7507c7490b574fd6c"
         BypassApproval="false"
         Enable="true" />
 	<!--BypassApproval 设置是否为绕过审核分享, 最好是false-->
     <WechatMoments
         Id="5"
         SortId="5"
-        AppId="wx7c35ac6495868a48"
-        AppSecret="ec9423ddc4c6ec73395f0da8de91afbd"
+        AppId="wxf255d360efc94eb6"
+        AppSecret="af1c6a083f690fa7507c7490b574fd6c"
         BypassApproval="false"
         Enable="true" />
         

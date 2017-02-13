@@ -3,11 +3,13 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              tools:context="com.pinhongbao.fragmet.InvitationFragment">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <WebView
+        android:id="@+id/webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="邀请赚钱"/>
-
+        android:layout_height="match_parent"></WebView>
+</RelativeLayout>
 </FrameLayout>
