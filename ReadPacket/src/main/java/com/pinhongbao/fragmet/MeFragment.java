@@ -126,6 +126,7 @@ public class MeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        resetInfo();
 
     }
 
@@ -134,6 +135,7 @@ public class MeFragment extends Fragment {
         tvId.setText(SPUtils.getUid(getActivity()));
         String getnicname = SPUtils.getnicname(getActivity());
         if (TextUtils.isEmpty(getnicname)) {
+            tvNiname.setText("未登录,请先登录");
             isNicname = false;
         } else {
             isNicname = true;
@@ -151,6 +153,10 @@ public class MeFragment extends Fragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.layout_layout://退出
+                SPUtils.PutUid(getActivity(),null);
+                SPUtils.PutBalance(getActivity(),null);
+                SPUtils.Putnicname(getActivity(),null);
+                SPUtils.PutIcon(getActivity(),null);
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 break;
             case R.id.layout_pash://余额兑现

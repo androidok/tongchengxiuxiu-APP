@@ -419,4 +419,105 @@ public class ApiService {
                     }
                 });
     }
+    /**发起支付
+     * @param
+     * @param
+     * @param parsedRequestListener
+     */
+    public static void send_task(final  Context context,String uid,String num,String pay,String title,String payStyle, final ParsedRequestListener<String> parsedRequestListener){
+        HashMap<String,String> hashMap=new HashMap<>();
+        hashMap.put("uid",uid);
+        hashMap.put("num",num);
+        hashMap.put("pay",pay);
+        hashMap.put("title",title);
+        hashMap.put("payStyle",payStyle);
+        RxAndroidNetworking.post(commonParme.apiservice.URL + commonParme.apiservice.url_task_detail)
+                .setPriority(Priority.IMMEDIATE)
+                .addBodyParameter(hashMap)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("发起任务",response.toString());
+                        if (TextUtils.isEmpty(response.toString())){
+                            UtilTool.ShowToast(context,"获取失败");
+                            return;
+                        }
+                        parsedRequestListener.onResponseResult(response.toString());
+//
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        parsedRequestListener._OnError(anError.toString());
+                    }
+                });
+    }
+    /**得到红包id
+     * @param
+     * @param
+     * @param parsedRequestListener
+     */
+    public static void check_redpack(final  Context context,String cid, final ParsedRequestListener<String> parsedRequestListener){
+        HashMap<String,String> hashMap=new HashMap<>();
+        hashMap.put("cid",cid);
+        RxAndroidNetworking.post(commonParme.apiservice.URL + commonParme.apiservice.url_check_detail)
+                .setPriority(Priority.IMMEDIATE)
+                .addBodyParameter(hashMap)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("检查红包详情",response.toString());
+                        if (TextUtils.isEmpty(response.toString())){
+                            UtilTool.ShowToast(context,"获取失败");
+                            return;
+                        }
+                        parsedRequestListener.onResponseResult(response.toString());
+//
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        parsedRequestListener._OnError(anError.toString());
+                    }
+                });
+    }
+    /**拆红包
+     * {
+     "back": "1.11",
+     "topback": 1,
+     "status": 200,
+     "msg": "1.11"
+     }
+     * @param
+     * @param
+     * @param parsedRequestListener
+     */
+    public static void chai_redpack(final  Context context,String rid,String uid, final ParsedRequestListener<String> parsedRequestListener){
+        HashMap<String,String> hashMap=new HashMap<>();
+        hashMap.put("rid",rid);
+        hashMap.put("uid",uid);
+        RxAndroidNetworking.post(commonParme.apiservice.URL + commonParme.apiservice.uri_chai_rel_detail)
+                .setPriority(Priority.IMMEDIATE)
+                .addBodyParameter(hashMap)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("拆红包",response.toString());
+                        if (TextUtils.isEmpty(response.toString())){
+                            UtilTool.ShowToast(context,"获取失败");
+                            return;
+                        }
+                        parsedRequestListener.onResponseResult(response.toString());
+//
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        parsedRequestListener._OnError(anError.toString());
+                    }
+                });
+    }
 }

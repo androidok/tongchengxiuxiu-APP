@@ -16,6 +16,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.pinhongbao.Adapter.RedPackRecodAdapter;
 import com.pinhongbao.Model.redPackRecordInfo;
 import com.pinhongbao.R;
+import com.pinhongbao.Util.SPUtils;
 import com.pinhongbao.Util.SelecPopuview;
 import com.pinhongbao.Util.UtilTool;
 import com.pinhongbao.Util.commonParme;
@@ -102,7 +103,7 @@ public class RedPackRecordActivity extends Activity {
      */
     private void getdata(int page) {
         progressDialog.show();
-        ApiService.getRedPackcoredInfo(this, "200086", type+"", page + "", new ApiService.ParsedRequestListener<String>() {
+        ApiService.getRedPackcoredInfo(this, SPUtils.getUid(this), type+"", page + "", new ApiService.ParsedRequestListener<String>() {
             @Override
             public void onResponseResult(String onpase) {
                 try {

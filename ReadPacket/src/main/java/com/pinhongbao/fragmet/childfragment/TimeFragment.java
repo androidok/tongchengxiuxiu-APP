@@ -17,6 +17,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.pinhongbao.Adapter.HomeAdapter;
 import com.pinhongbao.Model.homeInfo;
 import com.pinhongbao.R;
+import com.pinhongbao.Util.SPUtils;
 import com.pinhongbao.activity.DetailActivity;
 import com.pinhongbao.serviceTool.ApiService;
 
@@ -96,7 +97,7 @@ public class TimeFragment extends Fragment {
      */
     private void getData(int page) {
         progressDialog.show();
-        ApiService.gethomeInfo(getActivity(),"", "1", "11", page, new ApiService.ParsedRequestListener<List<homeInfo>>() {
+        ApiService.gethomeInfo(getActivity(), SPUtils.getUid(getActivity()), "1", "11", page, new ApiService.ParsedRequestListener<List<homeInfo>>() {
             @Override
             public void onResponseResult(List<homeInfo> homeInfo) {
                 Log.e("加载数据", "" + homeInfo.toString());

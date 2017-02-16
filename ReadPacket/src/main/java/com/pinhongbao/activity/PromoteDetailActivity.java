@@ -17,6 +17,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.pinhongbao.Adapter.PromotedadailAdapter;
 import com.pinhongbao.Model.promotedatailInfo;
 import com.pinhongbao.R;
+import com.pinhongbao.Util.SPUtils;
 import com.pinhongbao.Util.UtilTool;
 import com.pinhongbao.Util.commonParme;
 import com.pinhongbao.serviceTool.ApiService;
@@ -95,7 +96,7 @@ public class PromoteDetailActivity extends Activity {
      */
     private void getdata() {
         progressDialog.show();
-        ApiService.getPromotedetailInfo(this, "200086", new ApiService.ParsedRequestListener<String>() {
+        ApiService.getPromotedetailInfo(this, SPUtils.getUid(this), new ApiService.ParsedRequestListener<String>() {
             @Override
             public void onResponseResult(String onpanse) {
                 try {

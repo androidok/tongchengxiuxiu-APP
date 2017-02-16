@@ -7,4 +7,5 @@
     <color name="color_gray">#cccccc</color>//灰色
     <color name="color_while">#ffffff</color>
     <color name="color_jnon_selector">#DB4633</color>
+    <color name="transparent">#00000000</color>
 </resources>

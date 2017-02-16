@@ -37,6 +37,10 @@ public class commonParme {
         public static final String url_phonelogin_detail="appMobileLogin/key/jnooo/vcode/2bedfcde3ef52035eda172a9c0a6cb8f";
         //发起任务
         public static final String url_task_detail="pay/key/jnooo/vcode/2bedfcde3ef52035eda172a9c0a6cb8f";
+        //检查红包  得到红包id
+        public static final String url_check_detail="checkPay/key/jnooo/vcode/2bedfcde3ef52035eda172a9c0a6cb8f";
+        //拆红包
+        public static final String uri_chai_rel_detail="openRed/key/jnooo/vcode/2bedfcde3ef52035eda172a9c0a6cb8f";
     }
     public static class spInfo{
         public static final String sp="sp";
@@ -45,4 +49,18 @@ public class commonParme {
         public static final String Nicname="nicname";//昵称
         public static final String Balance="Balance";//余额
     }
+    public static class  weixinInfo{
+
+      /*  //微信
+        #define WXAppId @"wxf255d360efc94eb6"
+//微信 商户号
+                #define  WXMerchant @"1412366902"
+
+//微信商户key
+                #define WXkey @"af1c6a083f690fa7507c7490b574fd6c"*/
+        public static final String WXAppId="wxf255d360efc94eb6";
+        public static final String WXMerchant="1412366902";
+        public static final String WINXIN_SECRET="af1c6a083f690fa7507c7490b574fd6c";
+    }
+
 }

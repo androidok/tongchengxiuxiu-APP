@@ -199,7 +199,7 @@ public class LoginActivity extends Activity {
                             String mobile = jsonObject.getJSONObject("uinfo").getString("mobile");
                             JSONObject uinfo = jsonObject.getJSONObject("uinfo");
                             registerInfo registerInfo = JSON.parseObject(uinfo.toString(), registerInfo.class);
-                            UtilTool.ShowToast(LoginActivity.this,registerInfo.toString());
+//                            UtilTool.ShowToast(LoginActivity.this,registerInfo.toString());
                             SPUtils.PutUid(LoginActivity.this,registerInfo.getId());
                             SPUtils.PutIcon(LoginActivity.this,registerInfo.getAvatar());
                             SPUtils.Putnicname(LoginActivity.this,registerInfo.getUser_nicename());

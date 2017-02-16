@@ -22,6 +22,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.pinhongbao.Model.RedPackInfo;
 import com.pinhongbao.R;
 import com.pinhongbao.Util.GlideCircleTransform;
+import com.pinhongbao.Util.SPUtils;
 import com.pinhongbao.Util.UtilTool;
 import com.pinhongbao.Util.commonParme;
 import com.pinhongbao.serviceTool.ApiService;
@@ -105,7 +106,7 @@ public class DetailActivity extends Activity {
 
     private void getData() {
         progressDialog.show();
-        ApiService.getRedPackInfo(this, "200086", rid, new ApiService.ParsedRequestListener<String>() {
+        ApiService.getRedPackInfo(this, SPUtils.getUid(this), rid, new ApiService.ParsedRequestListener<String>() {
             @Override
             public void onResponseResult(String onpase) {
                 try {
@@ -119,6 +120,7 @@ public class DetailActivity extends Activity {
                         double price = pay * num - (num - 1) * 0.01;
                         tvContanct.setText("支付" + pay + "人,已参与" + red.getString("numed")+ "人,满" + num + "人开奖" + ",最高分得" + price + "元");
                         List<RedPackInfo> redPackInfos = JSON.parseArray(paylogList.toString(), RedPackInfo.class);
+                        String status = red.getString("status");//是1的话就是可以拆了
                         for (int i=0;i<redPackInfos.size();i++){
                             redPackInfoList.add(redPackInfos.get(i));
                         }
@@ -129,6 +131,13 @@ public class DetailActivity extends Activity {
                             //已经参与了
                             isJson=true;
                             btnJoin.setText("已参与");
+
+                        }
+                        if ("1".equalsIgnoreCase(status)){
+                            Intent intent=new Intent(DetailActivity.this,chaiDetailActivity.class);
+                            intent.putExtra("rid",rid);
+                            startActivity(intent);
+                            finish();
 
                         }
                         myadapter.notifyDataSetChanged();

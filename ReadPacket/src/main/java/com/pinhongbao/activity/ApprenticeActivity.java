@@ -14,6 +14,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.pinhongbao.Adapter.ApprenticeAdapter;
 import com.pinhongbao.Model.ApprenticeInfo;
 import com.pinhongbao.R;
+import com.pinhongbao.Util.SPUtils;
 import com.pinhongbao.Util.UtilTool;
 import com.pinhongbao.Util.commonParme;
 import com.pinhongbao.serviceTool.ApiService;
@@ -91,7 +92,7 @@ public class ApprenticeActivity extends Activity {
      */
     private void getdata() {
         progressDialog.show();
-        ApiService.getApprenticeInfo(this, "200086", new ApiService.ParsedRequestListener<String>() {
+        ApiService.getApprenticeInfo(this, SPUtils.getUid(this), new ApiService.ParsedRequestListener<String>() {
             @Override
             public void onResponseResult(String onpaser) {
                 try {

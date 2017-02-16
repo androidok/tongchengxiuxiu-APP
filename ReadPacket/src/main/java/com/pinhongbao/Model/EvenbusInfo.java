@@ -14,4 +14,13 @@ public class EvenbusInfo {
     public void setSuccessful(boolean successful) {
         isSuccessful = successful;
     }
+    int message;
+
+    public int getMessage() {
+        return message;
+    }
+
+    public void setMessage(int message) {
+        this.message = message;
+    }
 }
